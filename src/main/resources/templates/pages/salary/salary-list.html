@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: base(~{::body})}">
+<body>
+<!--th:replace="~{layout/base :: base(~{::body})}">-->
+<div  th:fragment="content" class="flex-1 overflow-auto p-6">
+    <div class="bg-white rounded-lg shadow">
+        <div class="p-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <h2 class="text-xl font-semibold mb-4 md:mb-0">Salary</h2>
+                <form action="#" th:action="@{/salary/calculate}" method="post" class="space-y-4 flex flex-row item-center justify-center">
+                    <div>
+                        <label for="monthYear" class="block text-gray-700 font-medium">Select Month</label>
+                        <input  required
+                                type="month"
+                                id="monthYear"
+                                name="monthYear"
+                                class="mr-2 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        >
+                    </div>
+                    <button type="submit"
+                            class="ml-4 w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                        Calculate Salary
+                    </button>
+                    <a href="/salary/pay" class="block text-center ml-4 w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                        Apply
+                    </a>
+                </form>
+            </div>
+            <!-- Table -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Employee ID
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Employee Name
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Total Hours Worked
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Hourly Rate
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Bonus
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Total Salary
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody th:each="salary : ${salary}" class="bg-white divide-y divide-gray-200">
+                    <tr class="hover:bg-gray-50">
+                        <td th:text="${salary.employee.id}" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"></td>
+                        <td th:text="${salary.employee.name}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                        <td th:text="${salary.totalHoursWorked}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                        <td th:text="${salary.hourlyRate}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                        <td th:text="${salary.bonus}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                        <td th:text="${salary.totalSalary}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span th:text="${salary.status}" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800"></span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex space-x-3">
+                                <button type="button"
+                                        th:data-id="${salary.id}"
+                                        th:data-name="${salary.employee.name}"
+                                        th:data-totalHoursWorked="${salary.totalHoursWorked}"
+                                        th:data-hourlyRate="${salary.hourlyRate}"
+                                        th:data-bonus="${salary.bonus}"
+                                        th:data-totalSalary="${salary.totalSalary}"
+                                        th:data-employeeId="${salary.employee.id}"
+                                        onclick="openModal(this)"
+                                        class="text-indigo-600 hover:text-indigo-900">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="salaryModal" class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 hidden items-center justify-center">
+        <div th:replace="~{fragments/modals/salary-input-modal}"></div>
+    </div>
+</div>
+
+<th:block th:fragment="page-scripts">
+    <script th:src="@{/js/Modal.js}"></script>
+    <script>
+        function openModal(button) {
+            const salaryModal = new ModalWithForm("salaryModal", "Salary", null, '/salary/update');
+            let data;
+            if (button != null) {
+                data = {
+                    id: button.getAttribute('data-id') || "",
+                    name: button.getAttribute('data-name') || "",
+                    totalHoursWorked: button.getAttribute('data-totalHoursWorked') || "",
+                    hourlyRate: button.getAttribute('data-hourlyRate') || "",
+                    bonus: button.getAttribute('data-bonus') || "",
+                    totalSalary: button.getAttribute('data-totalSalary') || "",
+                    employeeId: button.getAttribute('data-employeeId') || ""
+                };
+                console.log("Button clicked for action:", data);
+            }
+            salaryModal.open(data);
+        }
+
+        function closeModal() {
+            const salaryModal = new ModalWithForm('salaryModal', null, '/salary/update');
+            salaryModal.close();
+        }
+    </script>
+</th:block>
+</body>
+</html>

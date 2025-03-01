@@ -1,0 +1,40 @@
+<!-- Left Panel: Table Display -->
+<div th:fragment="table-layout" class="md:w-2/3 bg-white p-6 rounded-lg shadow-md">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-orange-400 to-orange-500 p-6 rounded-t-lg text-white shadow-md flex justify-between items-center">
+        <h1 class="text-2xl font-bold">Table Management</h1>
+        <div class="flex space-x-4">
+        <span class="flex items-center space-x-1">
+          <span class="h-4 w-4 bg-green-500 rounded-full"></span> <span>Available</span>
+        </span>
+            <span class="flex items-center space-x-1">
+          <span class="h-4 w-4 bg-yellow-400 rounded-full"></span> <span>Occupied</span>
+        </span>
+            <span class="flex items-center space-x-1">
+          <span class="h-4 w-4 bg-blue-400 rounded-full"></span> <span>Reserved</span>
+        </span>
+        </div>
+    </div>
+
+    <!-- Table Grid -->
+    <div class="grid grid-cols-4 gap-4 p-6">
+        <div th:each="table : ${tables}" th:id="'table-' + ${table.id}" th:tablestatus="${table.status}"
+             class="relative border p-4 rounded-lg hover:shadow-lg transition-shadow"
+             th:onclick="'selectTable(\'' + ${table.id} + '\')'"
+        >
+            <div th:class="'absolute top-2 right-2 h-3 w-3 rounded-full' +
+        (${table.status.name() == 'AVAILABLE' ? ' bg-green-500' : ''}) +
+        (${table.status.name() == 'OCCUPIED' ? ' bg-yellow-400' : ''}) +
+        (${table.status.name() == 'RESERVED' ? ' bg-blue-400' : ''})"></div>
+            <div th:text="'Table ' + ${table.tableNumber}" class="text-xl font-semibold text-gray-800"></div>
+            <div class="text-sm text-gray-600 mt-1" th:text="'Capacity: ' + ${0}"></div>
+            <div class="mt-4">
+                <span th:class="'inline-block px-2 py-1 text-xs font-medium rounded-full' +
+                (${table.status.name() == 'RESERVED' ? ' text-blue-700 bg-blue-100' : ''}) +
+                (${table.status.name() == 'AVAILABLE' ? ' text-green-700 bg-green-100' : ''}) +
+                (${table.status.name() == 'OCCUPIED' ? ' text-yellow-700 bg-yellow-100' : ''})"
+                th:text="${#strings.capitalize(table.status.name().toLowerCase())}"></span>
+            </div>
+        </div>
+    </div>
+</div>

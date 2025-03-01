@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title th:text="'Orders - Table Number ' + ${tableNumber}"></title>
+</head>
+<body class="bg-gray-100 min-h-screen">
+<div class="container mx-auto px-4 py-8">
+    <!-- Header Section -->
+    <input id="orderId" th:value="${orderId}" hidden>
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800" th:text="'Table Number ' + ${order.diningTable.tableNumber}"></h1>
+                <p class="text-gray-600" th:text="'Order ID: #' + ${order.id}"></p>
+            </div>
+            <div class="text-right">
+                <p class="text-gray-600" th:text="'Time: ' + ${order.orderDate.hour} + ':' + ${order.orderDate.minute}"></p>
+                <p class="text-gray-600" th:text="'Date: ' + ${order.orderDate.dayOfMonth} + '-' + ${order.orderDate.monthValue} + '-' + ${order.orderDate.year}"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Items Section -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800">Các món đã đặt</h2>
+            <a th:href="@{/orders/menu(orderId=${orderId})}" class="block text-center px-6 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-200">
+                Add Dish
+            </a>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                <tr class="bg-gray-50">
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Món ăn</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số lượng</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Đơn giá</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thành tiền</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                <tr th:each="item : ${orderItems}">
+                    <td class="px-6 py-4 whitespace-nowrap" th:text="${item.dish.name}"></td>
+                    <td class="px-6 py-4 whitespace-nowrap" th:text="${item.quantity}"></td>
+                    <td class="px-6 py-4 whitespace-nowrap" th:text="${item.dish.price} + 'VND'"></td>
+                    <td class="px-6 py-4 whitespace-nowrap" th:text="${item.quantity * item.dish.price} + 'VND'"></td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                          th:class="${item.orderStatus.name() == 'COMPLETED' ? 'bg-green-100 text-green-800' : item.orderStatus.name() == 'PENDING' ? 'bg-yellow-100 text-yellow-800' : ''}"
+                          th:text="${item.orderStatus.name()}"></span>
+                            </td>
+                        </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Summary Section -->
+<!--    <div class="bg-white rounded-lg shadow-lg p-6 mt-6">-->
+<!--        <h2 class="text-xl font-semibold mb-4">Tổng cộng</h2>-->
+<!--        <div class="space-y-4">-->
+<!--            <div class="flex justify-between">-->
+<!--                <span class="text-gray-600">Tổng tiền món:</span>-->
+<!--                <span class="font-medium" th:text="${totalFoodPrice} + 'VND'"></span>-->
+<!--            </div>-->
+<!--            <div class="flex justify-between">-->
+<!--                <span class="text-gray-600">VAT (10%):</span>-->
+<!--                <span class="font-medium" th:text="${totalFoodPrice * 0.1} + 'VND'"></span>-->
+<!--            </div>-->
+<!--            <div class="flex justify-between">-->
+<!--                <span class="text-gray-600">Phí phục vụ:</span>-->
+<!--                <span class="font-medium" th:text="0 + 'VND'"></span>-->
+<!--            </div>-->
+<!--            <div class="border-t pt-4 mt-4">-->
+<!--                <div class="flex justify-between">-->
+<!--                    <span class="font-semibold">Tổng cộng:</span>-->
+<!--                    <span class="font-bold text-lg text-primary" th:text="${totalAmount} + 'VND'"></span>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+        <a th:href="@{/orders/checkout(orderId=${orderId})}" class="block text-center w-full mt-6 bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-primary-dark transition-colors">
+            Thanh toán
+        </a>
+    </div>
+</div>
+<script>
+    setInterval(function() {
+        location.reload();
+    }, 5000);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodieWeb</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+<!-- Navbar -->
+<header class="bg-white shadow-md py-4">
+    <div class="container mx-auto flex justify-between items-center px-4">
+        <a href="#" class="text-2xl font-bold text-orange-500">🍴 FoodieWeb</a>
+        <nav>
+            <ul class="flex space-x-4">
+                <li><a href="/login" class="px-6 py-2 bg-orange-500 text-white rounded-full hover:bg-orange-600 transition">Login</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<!-- Hero Section -->
+<section class="bg-gray-100 py-20 ">
+    <div class="container mx-auto text-center px-4">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">Elevate Your Inner Foodie with Every Bite.</h1>
+        <a href="#" class="mt-6 px-8 py-3 bg-orange-500 text-white rounded-full hover:bg-orange-600 inline-block text-center transition">
+            Order Now
+        </a>
+        <a href="/reservations/booking" class="mt-6 px-8 py-3 bg-orange-500 text-white rounded-full hover:bg-orange-600 inline-block text-center transition ml-4">
+            Reservation Now
+        </a>
+    </div>
+</section>
+
+<!-- Premium Menu Section -->
+<section class="py-8 m-4">
+    <div class="container mx-auto px-4">
+        <h2 class="text-xl font-bold text-center mb-6 text-gray-800">Premium Menu</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8">
+            <!-- Card for each dish -->
+            <div th:each="dish : ${dishes}" class="bg-white p-4 border border-gray-200 rounded-lg shadow-md hover:shadow-xl transition-all">
+                <img th:src="${dish.image}" alt="Dish Image" class="w-full h-32 object-cover rounded-t-md mb-4">
+                <div class="p-2">
+                    <h3 th:text="${dish.name}" class="text-sm font-semibold text-gray-800 mb-2"></h3>
+                    <p th:text="${dish.description}" class="text-xs text-gray-500 mb-2 truncate"></p>
+                    <div class="mt-2 flex justify-between items-center">
+                        <span th:text="${dish.price + ' $'}" class="text-orange-500 font-bold text-sm"></span>
+                        <button class="px-4 py-2 text-xs bg-orange-500 text-white rounded-full hover:bg-orange-600 transition">
+                            Buy Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Customer Reviews Section -->
+<section class="py-8 bg-gray-50 m-4">
+    <div class="container mx-auto px-4">
+        <h2 class="text-xl font-bold text-center mb-6 text-gray-800">Customer Reviews</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Static review card 1 -->
+            <div class="bg-white p-4 border border-gray-200 rounded-lg shadow-md hover:shadow-xl transition-all">
+                <div class="mb-2">
+                    <span class="text-sm font-semibold text-gray-800">John Doe</span>
+                    <span class="text-yellow-500 ml-2">
+                        ★★★★☆
+                    </span>
+                </div>
+                <p class="text-xs text-gray-600">"The food was amazing! Highly recommend the spicy pasta."</p>
+            </div>
+            <!-- Static review card 2 -->
+            <div class="bg-white p-4 border border-gray-200 rounded-lg shadow-md hover:shadow-xl transition-all">
+                <div class="mb-2">
+                    <span class="text-sm font-semibold text-gray-800">Jane Smith</span>
+                    <span class="text-yellow-500 ml-2">
+                        ★★★★★
+                    </span>
+                </div>
+                <p class="text-xs text-gray-600">"Absolutely loved the service and the ambiance. Will come again!"</p>
+            </div>
+            <!-- Static review card 3 -->
+            <div class="bg-white p-4 border border-gray-200 rounded-lg shadow-md hover:shadow-xl transition-all">
+                <div class="mb-2">
+                    <span class="text-sm font-semibold text-gray-800">Mike Johnson</span>
+                    <span class="text-yellow-500 ml-2">
+                        ★★★★☆
+                    </span>
+                </div>
+                <p class="text-xs text-gray-600">"Great taste but the portion size could be bigger."</p>
+            </div>
+            <!-- Static review card 4 -->
+            <div class="bg-white p-4 border border-gray-200 rounded-lg shadow-md hover:shadow-xl transition-all">
+                <div class="mb-2">
+                    <span class="text-sm font-semibold text-gray-800">Emily Brown</span>
+                    <span class="text-yellow-500 ml-2">
+                        ★★★☆☆
+                    </span>
+                </div>
+                <p class="text-xs text-gray-600">"The dessert was delightful, but the main course was average."</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Restaurant Info Section -->
+<section class="bg-gray-100 py-8 m-4">
+    <div class="container mx-auto px-4 text-center">
+        <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">Contact Us</h2>
+        <div class="bg-white p-6 border border-gray-200 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Restaurant Information</h3>
+            <p class="text-gray-600 mb-4">We'd love to hear from you! Here are the details to get in touch with us.</p>
+            <ul class="text-left">
+                <li class="mb-2">
+                    <strong class="text-gray-700">Email:</strong> <a href="ledinhloc7@gmail.com" class="text-orange-500">info@foodieweb.com</a>
+                </li>
+                <li class="mb-2">
+                    <strong class="text-gray-700">Phone:</strong> <a href="tel:+84386056830" class="text-orange-500">+1 (234) 567-890</a>
+                </li>
+                <li class="mb-2">
+                    <strong class="text-gray-700">Address:</strong> So 1 VVN, Thu Duc, TP Ho Chi Minh
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+</body>
+</html>

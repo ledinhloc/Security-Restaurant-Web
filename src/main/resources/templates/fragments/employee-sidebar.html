@@ -1,0 +1,89 @@
+<div class="bg-gray-100 h-screen" th:fragment="employee-sidebar" xmlns:sec="http://www.w3.org/1999/xhtml">
+  <!-- Toggle Button -->
+  <button id="sidebarToggle" class="fixed top-4 left-4 z-50 bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="fixed top-0 left-0 h-screen w-16 bg-white shadow-lg transition-all duration-300 z-40 overflow-hidden">
+    <div class="flex flex-col h-full">
+      <!-- Logo -->
+      <div class="p-4 flex items-center justify-center">
+        <span class="ml-2 hidden text-xl font-bold text-gray-800 sidebar-expanded">Restaurant</span>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="mt-4 flex flex-col space-y-2">
+        <a href="/profile" class="flex items-center justify-center p-2 text-gray-600 hover:bg-gray-100 rounded-md transition">
+          <i class="fas fa-home w-6"></i>
+          <span class="hidden ml-3 sidebar-expanded">Dashboard</span>
+        </a>
+        <a href="/shifts/register" class="flex items-center justify-center p-2 text-gray-600 hover:bg-gray-100 rounded-md transition">
+          <i class="fas fa-sun w-6"></i>
+          <span class="hidden ml-3 sidebar-expanded">Register Shift</span>
+        </a>
+        <a href="/schedules/employee-schedule" class="flex items-center justify-center p-2 text-gray-600 hover:bg-gray-100 rounded-md transition">
+          <i class="fas fa-calendar-days w-6"></i>
+          <span class="hidden ml-3 sidebar-expanded">View Schedule</span>
+        </a>
+        <a sec:authorize="hasRole('STAFF')" href="/orders/manage" class="flex items-center justify-center p-2 text-gray-600 hover:bg-gray-100 rounded-md transition">
+          <i class="fas fa-box w-6 text-center"></i>
+          <span class="hidden ml-3 sidebar-expanded">Tables Order</span>
+        </a>
+        <a sec:authorize="hasRole('CHEF')" href="/order-item" class="flex items-center justify-center p-2 text-gray-600 hover:bg-gray-100 rounded-md transition">
+          <i class="fa-solid fa-bowl-rice"></i>
+          <span class="hidden ml-3 sidebar-expanded">Orders</span>
+        </a>
+      </nav>
+
+      <!-- Footer Links -->
+      <div class="mt-auto border-t border-gray-200 flex flex-col space-y-2">
+        <a href="#" class="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded-md transition">
+          <i class="fas fa-cog w-6 text-center"></i>
+          <span class="hidden ml-3 sidebar-expanded">Settings</span>
+        </a>
+        <a href="/logout" class="flex items-center p-2 text-gray-600 hover:bg-gray-100 rounded-md transition">
+          <i class="fas fa-sign-out-alt w-6 text-center"></i>
+          <span class="hidden ml-3 sidebar-expanded">Log Out</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay -->
+  <div id="mainContentOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden"></div>
+
+  <script>
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('mainContentOverlay');
+    const expandedClass = 'w-64';
+    const collapsedClass = 'w-16';
+    let isExpanded = false;
+
+    const toggleSidebar = () => {
+      isExpanded = !isExpanded;
+      sidebar.classList.toggle(expandedClass, isExpanded);
+      sidebar.classList.toggle(collapsedClass, !isExpanded);
+      overlay.classList.toggle('hidden', !isExpanded);
+
+      // Toggle visibility of text labels
+      document.querySelectorAll('.sidebar-expanded').forEach(label => {
+        label.classList.toggle('hidden', !isExpanded);
+      });
+    };
+
+    sidebarToggle.addEventListener('click', toggleSidebar);
+    overlay.addEventListener('click', toggleSidebar);
+
+    // Highlight active link
+    document.querySelectorAll('nav a').forEach(link => {
+      if (window.location.pathname.startsWith(link.getAttribute('href'))) {
+        link.classList.add('text-blue-500', 'bg-blue-50');
+      }
+    });
+  </script>
+</div>
+

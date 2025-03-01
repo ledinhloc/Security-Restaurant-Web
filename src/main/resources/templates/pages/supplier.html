@@ -1,0 +1,40 @@
+<!-- suppliers.html (Main Page) -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="fragments/sidebar :: header">
+</head>
+<body class="bg-gray-100">
+<div class="flex h-screen">
+    <!-- Sidebar -->
+    <div th:replace="fragments/navbar :: navbar"></div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Top Bar -->
+        <div th:replace="fragments/topbar :: topbar"></div>
+
+        <!-- Content Area -->
+        <div class="flex-1 overflow-auto p-6">
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold">Suppliers</h2>
+                        <div class="flex space-x-3">
+                            <button class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                                Add Product
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div th:replace="fragments/supplier-diningTable :: supplier-diningTable"></div>
+
+                    <!-- Pagination -->
+<!--                    <div th:replace="fragments/pagination :: pagination"></div>-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

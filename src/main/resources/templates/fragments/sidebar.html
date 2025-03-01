@@ -1,0 +1,88 @@
+<div class="w-64 bg-white shadow-lg" th:fragment="sidebar">
+  <div class="p-4">
+    <div class="flex items-center space-x-2">
+      <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+        <span class="text-white font-bold">K</span>
+      </div>
+      <span class="text-xl font-bold text-gray-800">Restaurant</span>
+    </div>
+  </div>
+  <nav class="mt-8">
+    <a href="/dashboard" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100">
+      <i class="fas fa-home w-6"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="/employees" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100">
+      <i class="fas fa-user w-6"></i>
+      <span>Employees</span>
+    </a>
+    <a href="/salary" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100">
+      <i class="fas fa-box w-6"></i>
+      <span>Salary</span>
+    </a>
+    <a href="/dishes" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100">
+      <i class="fas fa-chart-bar w-6"></i>
+      <span>Dishes</span>
+    </a>
+    <a href="/inventories" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100">
+      <i class="fas fa-warehouse w-6"></i>
+      <span>Inventory</span>
+    </a>
+    <a href="/suppliers" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100">
+      <i class="fa-solid fa-boxes-packing w-6"></i>
+      <span>Suppliers</span>
+    </a>
+    <a href="/customers" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100">
+      <i class="fas fa-user w-6"></i>
+      <span>Customer</span>
+    </a>
+    <a href="/tables" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100">
+      <i class="fas fa-utensils w-6"></i>
+      <span>Tables</span>
+    </a>
+    <a href="/discounts" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100">
+      <i class="fas fa-percent w-6"></i>
+      <span>Discounts</span>
+    </a>
+    <a href="/reservations" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100">
+      <i class="fas fa-store w-6"></i>
+      <span>Reservations</span>
+    </a>
+    <a href="/shifts" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100">
+      <i class="fas fa-sun w-6"></i>
+      <span>Shifts</span>
+    </a>
+    <a href="/schedules" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100">
+      <i class="fas fa-calendar-days w-6"></i>
+      <span>Schedules</span>
+    </a>
+  </nav>
+  <!-- Bottom nav items -->
+  <div class="absolute bottom-0 w-64 border-t border-gray-200">
+    <a href="/settings" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100">
+      <i class="fas fa-cog w-6"></i>
+      <span>Settings</span>
+    </a>
+    <a href="/logout" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100">
+      <i class="fas fa-sign-out-alt w-6"></i>
+      <span>Log Out</span>
+    </a>
+  </div>
+  <script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+      const currentPath = window.location.pathname;
+      const navLinks = document.querySelectorAll('nav a');
+
+      navLinks.forEach(link => {
+        const linkPath = link.getAttribute('href').split('?')[0];
+
+        if (currentPath.startsWith(linkPath)) {
+          link.classList.add('text-blue-500', 'bg-blue-50');
+        } else {
+          link.classList.remove('text-blue-500', 'bg-blue-50');
+        }
+      });
+    });
+  </script>
+</div>
+

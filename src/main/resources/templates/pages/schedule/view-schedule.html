@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shift Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.3/dragula.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dragula/3.7.3/dragula.min.css">
+</head>
+<body class="bg-gray-50 p-6 font-sans">
+    <!-- Header Section -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">November 2024</h1>
+        <a th:href="@{/schedules/config}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+            Auto Scheduling
+        </a>
+        <a th:href="@{/schedules/published}" class="ml-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+            Published
+        </a>
+        <div class="flex gap-3">
+            <button onclick="navigateWeek('prev')" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                Previous
+            </button>
+            <button onclick="navigateWeek('today')" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                Today
+            </button>
+            <button onclick="navigateWeek('next')" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                Next
+            </button>
+        </div>
+    </div>
+
+    <!-- Calendar Container -->
+    <div id="calendar" class="overflow-x-auto"></div>
+
+    <!-- Modal Overlay -->
+    <div id="modalOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+
+    <!-- Shift Edit Modal -->
+    <div id="shiftModal" class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl z-50 min-w-[300px]">
+        <h2 class="text-xl font-bold mb-4">Add Shift</h2>
+        <div id="modalContent" class="mb-4"></div>
+        <div class="flex justify-end gap-3">
+            <button onclick="saveShift()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                Save
+            </button>
+            <button onclick="closeModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let scheduleData = {};
+        let currentWeekStart = new Date();
+        let drake;
+        let employees;
+        let shifts;
+        const listEmployees = () => fetch(`/employees/list`)
+            .then(response => response.ok ? response.json() : Promise.reject('Error'))
+            .then(data => employees = data)
+            .catch(console.error);
+        const listShifts = () => fetch(`/shifts/list`)
+            .then(response => response.ok ? response.json() : Promise.reject('Error'))
+            .then(data => shifts = data)
+            .catch(console.error);
+
+        async function fetchScheduleData() {
+            await listEmployees();
+            console.log(employees)
+            const startDate = formatDateForAPI(currentWeekStart);
+            const endDate = formatDateForAPI(new Date(currentWeekStart.getTime() + 6 * 24 * 60 * 60 * 1000));
+            console.log(startDate, endDate);
+            try {
+                const response = await fetch(`/schedules/list?startDate=${startDate}&endDate=${endDate}`);
+                scheduleData = await response.json();
+                renderCalendar();
+            } catch (error) {
+                console.error('Error fetching schedule data:', error);
+            }
+        }
+
+        function formatDateForAPI(date) {
+            return date.toLocaleDateString('en-CA');
+        }
+
+        function getEmployeeBackgroundColor(employeeId) {
+            const colorId = employeeId % 5;
+            const colors = {
+                1: 'bg-red-100',
+                2: 'bg-green-100',
+                3: 'bg-blue-100',
+                4: 'bg-pink-100',
+                5: 'bg-yellow-100'
+            };
+            return colors[colorId] || 'bg-gray-100';
+        }
+
+        function renderCalendar() {
+            const calendar = document.getElementById('calendar');
+            let html = `
+                <table class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="w-48 px-4 py-3 border-b border-gray-200 text-left">Employee</th>
+            `;
+
+            // Render date headers
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(currentWeekStart);
+                date.setDate(date.getDate() + i);
+                const dateStr = date.toLocaleDateString('en-GB', {
+                    weekday: 'short',
+                    day: '2-digit',
+                    month: 'short'
+                });
+
+                html += `
+                    <th class="px-4 py-3 border-b border-gray-200">
+                        <div class="text-sm font-semibold">${dateStr}</div>
+                    </th>`;
+            }
+            html += '</tr></thead><tbody>';
+
+            // Render rows for each employee
+            Array.from(employees).forEach(employee => {
+                html += `
+                    <tr class="border-b border-gray-200">
+                        <td class="px-4 py-3">
+                            <div class="flex items-center">
+                                <img src="${employee.image}" alt="${employee.name}"
+                                     class="w-10 h-10 rounded-full flex-shrink-0 object-cover">
+                                <div class="ml-3">
+                                    <div class="font-medium">${employee.name}</div>
+                                    <div class="text-sm text-gray-600">${employee.position}</div>
+                                </div>
+                            </div>
+                        </td>
+                `;
+
+                // Render cells for each day
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(currentWeekStart);
+                    date.setDate(date.getDate() + i);
+                    const dateKey = date.toISOString().split('T')[0];
+                    const daySchedules = scheduleData[dateKey] || [];
+                    const employeeSchedules = daySchedules.filter(s => s.employee.id === employee.id);
+
+                    html += `
+                        <td class="px-4 py-3">
+                            <div class="shift-container min-h-[60px]"
+                                 data-date="${dateKey}"
+                                 data-employee="${employee.id}">
+                                ${employeeSchedules.map(schedule => `
+                                    <div class="shift-block mb-2 p-2 rounded ${getEmployeeBackgroundColor(employee.id)} text-sm cursor-move flex items-center justify-between"
+                                         draggable="true"
+                                         data-schedule-id="${schedule.scheduleId}">
+                                        <div>
+                                            ${schedule.shift?.shiftName ?? "Custom Shift"}<br>
+                                            ${schedule.startTime} - ${schedule.endTime}
+                                            <div class="text-xs text-gray-600">Status: ${schedule.status}</div>
+                                        </div>
+                                        <div class="flex items-center space-x-2 flex-row">
+                                            <button onclick="markAsCompletedSchedule(${schedule.scheduleId})"
+                                                    class="text-green-500 hover:text-green-700">Y
+                                            </button>
+                                            <button onclick="deleteSchedule(${schedule.scheduleId})"
+                                                    class="text-gray-500 hover:text-red-500">×</button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <button onclick="addShift('${dateKey}', ${employee.id})"
+                                    class="text-sm text-center text-blue-600 hover:text-blue-800 w-full">
+                                + Add Shift
+                            </button>
+                        </td>
+                    `;
+                }
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            calendar.innerHTML = html;
+
+            initializeDragAndDrop();
+        }
+
+        function initializeDragAndDrop() {
+            if (drake) {
+                drake.destroy();
+            }
+
+            drake = dragula([...document.querySelectorAll('.shift-container')], {
+                moves: function(el, container, handle) {
+                    return el.classList.contains('shift-block');
+                }
+            });
+
+            drake.on('drop', async function(el, target, source, sibling) {
+                console.log("el::::", el)
+                console.log("target::::", target)
+                const scheduleId = el.dataset.scheduleId;
+                const targetDate = target.dataset.date;
+                const targetEmployee = target.dataset.employee;
+
+                try {
+                    // Call API to update schedule
+                    const response = await fetch(`/schedules/${scheduleId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            workingDate: targetDate,
+                            employeeId: targetEmployee
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to update schedule');
+                    }
+
+                    // Refresh schedule data
+                    await fetchScheduleData();
+                } catch (error) {
+                    console.error('Error updating schedule:', error);
+                    // Revert the drag if there's an error
+                    drake.cancel(true);
+                }
+            });
+        }
+
+        async function deleteSchedule(scheduleId) {
+            try {
+                const response = await fetch(`/schedules/${scheduleId}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to delete schedule');
+                }
+
+                await fetchScheduleData();
+            } catch (error) {
+                console.error('Error deleting schedule:', error);
+            }
+        }
+
+        async function markAsCompletedSchedule(scheduleId) {
+            try {
+                const response = await fetch('/schedules/completed', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ scheduleId })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to post completed schedule');
+                }
+
+                await fetchScheduleData();
+            } catch (error) {
+                console.error('Error mark as completed schedule:', error);
+            }
+        }
+
+        async function addShift(date, employeeId) {
+            const modal = document.getElementById('shiftModal');
+            const overlay = document.getElementById('modalOverlay');
+            const modalContent = document.getElementById('modalContent');
+            const employee = Array.from(employees).find(e => e.id === employeeId);
+
+            // Format date for display
+            const displayDate = new Date(date).toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // Fetch shift templates asynchronously
+            const shifts = await listShifts(); // Assume listShifts() returns an array of shift objects with startTime, endTime, and name
+
+            // Generate options dynamically
+            const shiftOptions = shifts.map(shift => `
+                <option value="${shift.shiftId}" data-start="${shift.startTime}" data-end="${shift.endTime}">
+                    ${shift.shiftName} (${shift.startTime} - ${shift.endTime})
+                </option>
+            `).join('');
+
+            modalContent.innerHTML = `
+                <div class="space-y-4">
+                    <div class="font-medium">Schedule Shift</div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Employee</label>
+                        <div class="text-gray-900">${employee.name} - ${employee.position}</div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Date</label>
+                        <div class="text-gray-900">${displayDate}</div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="shiftTemplate" class="block text-sm font-medium text-gray-700">Shift Template</label>
+                        <select id="shiftTemplate" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select a shift template</option>
+                            ${shiftOptions}
+                        </select>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="customTimes" class="block text-sm font-medium text-gray-700">
+                            <input type="checkbox" id="customTimes" class="mr-2">
+                            Custom Times
+                        </label>
+                        <div id="customTimeInputs" class="space-y-2 hidden">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="startTime" class="block text-sm font-medium text-gray-700">Start Time</label>
+                                    <input type="time" id="startTime" class="w-full p-2 border border-gray-300 rounded">
+                                </div>
+                                <div>
+                                    <label for="endTime" class="block text-sm font-medium text-gray-700">End Time</label>
+                                    <input type="time" id="endTime" class="w-full p-2 border border-gray-300 rounded">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="notes" class="block text-sm font-medium text-gray-700">Notes</label>
+                        <textarea id="notes" rows="2" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                </div>
+            `;
+
+            // Add event listeners
+            const customTimesCheckbox = document.getElementById('customTimes');
+            const customTimeInputs = document.getElementById('customTimeInputs');
+            const shiftTemplateSelect = document.getElementById('shiftTemplate');
+
+            customTimesCheckbox.addEventListener('change', (e) => {
+                console.log("Changed:::")
+                customTimeInputs.classList.toggle('hidden', !customTimesCheckbox.checked);
+                shiftTemplateSelect.disabled = customTimesCheckbox.checked;
+            });
+
+            shiftTemplateSelect.addEventListener('change', (e) => {
+                const option = e.target.selectedOptions[0];
+                if (option.value) {
+                    document.getElementById('startTime').value = option.dataset.start;
+                    document.getElementById('endTime').value = option.dataset.end;
+                }
+            });
+
+            modal.dataset.date = date;
+            modal.dataset.employeeId = employeeId;
+
+            modal.classList.remove('hidden');
+            overlay.classList.remove('hidden');
+        }
+
+        async function saveShift() {
+            const modal = document.getElementById('shiftModal');
+            const date = modal.dataset.date;
+            const employeeId = parseInt(modal.dataset.employeeId);
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+            const shiftId = document.getElementById('shiftTemplate').value;
+
+            try {
+                const response = await fetch(`/schedules?shiftId=${shiftId}&employeeId=${employeeId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        workingDate: date,
+                        startTime,
+                        endTime,
+                        scheduleType: 'OPEN',
+                        status: 'Pending',
+                        maxRegistrations: 9999,
+                        registrationDeadline: '2024-12-21'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to create schedule');
+                }
+
+                closeModal();
+                await fetchScheduleData();
+            } catch (error) {
+                console.error('Error creating schedule:', error);
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('shiftModal');
+            const overlay = document.getElementById('modalOverlay');
+            modal.classList.add('hidden');
+            overlay.classList.add('hidden');
+        }
+
+        function navigateWeek(direction) {
+            if (direction === 'prev') {
+                currentWeekStart.setDate(currentWeekStart.getDate() - 7);
+            } else if (direction === 'next') {
+                currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+            } else if (direction === 'today') {
+                currentWeekStart = new Date();
+            }
+            fetchScheduleData();
+        }
+
+        // Initial load
+        fetchScheduleData();
+    </script>
+</body>
+</html>

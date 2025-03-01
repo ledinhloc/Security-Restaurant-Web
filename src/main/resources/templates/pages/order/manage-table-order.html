@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: base(~{::body})}" xmlns:sec="http://www.w3.org/1999/xhtml">
+<body>
+<div class="w-full ml-20 mx-auto flex flex-col md:flex-row gap-6 h-screen">
+    <div th:replace="~{fragments/table-layout}"></div>
+    <div th:replace="${status == 'AVAILABLE'} ? ~{fragments/create-checkin-order} : ~{fragments/order-item-sidebar}"></div>
+</div>
+<script>
+    function selectTable(tableId) {
+        let allTables = document.querySelectorAll('.border-orange-500');
+        allTables.forEach(table => {
+            table.classList.remove('border-orange-500');
+        });
+        let selectedTable = document.getElementById('table-' + tableId);
+        let tableStatus = selectedTable.getAttribute('tableStatus');
+        if (selectedTable) {
+            selectedTable.classList.add('border-orange-500');
+        }
+        window.location.href = '/orders/manage?tableId=' + tableId + '&status=' + tableStatus;
+    }
+</script>
+</body>
+</html>

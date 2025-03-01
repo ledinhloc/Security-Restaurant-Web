@@ -1,0 +1,18 @@
+
+<!-- fragments/pagination.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="pagination" class="flex items-center justify-between px-6 py-3 border-t border-gray-200">
+    <button th:disabled="${currentPage == 1}"
+            class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+        Previous
+    </button>
+    <span class="text-sm text-gray-700">
+        Page <span th:text="${currentPage}">1</span> of <span th:text="${totalPages}">10</span>
+    </span>
+    <button th:disabled="${currentPage == totalPages}"
+            class="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+        Next
+    </button>
+</div>
+</html>

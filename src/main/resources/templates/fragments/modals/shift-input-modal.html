@@ -1,0 +1,133 @@
+<div th:fragment="shift-modal">
+    <form id="modalForm" th:action="@{/shifts}" method="post" th:object="${shift}" class="bg-white max-w-md mx-auto p-6 rounded-lg shadow-md space-y-4">
+        <div id="modalTitle" class="font-medium text-lg text-gray-800">Create Open Shift</div>
+        <input type="hidden" th:if="${shiftId != null}" th:field="*{shiftId}"/>
+        <input type="hidden" th:field="*{available}"/>
+        <!-- Shift Name Input -->
+        <div class="space-y-2">
+            <label for="shiftName" class="block text-sm font-medium text-gray-700">Shift Name</label>
+            <input
+                    type="text"
+                    id="shiftName"
+                    name="shiftName"
+                    th:field="*{shiftName}"
+                    class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter shift name"
+            >
+        </div>
+
+        <!-- Shift Type Selection -->
+        <div class="space-y-2">
+            <label for="shiftType" class="block text-sm font-medium text-gray-700">Shift Type</label>
+            <select
+                    id="shiftType"
+                    name="shiftType"
+                    th:field="*{shiftType}"
+                    class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onchange="handleShiftTypeChange()"
+            >
+                <option value="REGULAR">Regular</option>
+                <option value="OPEN">Open</option>
+                <option value="FIXED">Fixed</option>
+            </select>
+        </div>
+
+        <!-- Open Shift - Max Registration and Working Date -->
+        <div id="openShiftInputs" class="space-y-2 hidden">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label for="maxRegistration" class="block text-sm font-medium text-gray-700">Max Registration</label>
+                    <input
+                            type="number"
+                            id="maxRegistration"
+                            name="maxRegistration"
+                            th:field="*{maxRegistration}"
+                            class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Maximum registrations"
+                    >
+                </div>
+                <div class="space-y-2">
+                    <label for="workingDateOpen" class="block text-sm font-medium text-gray-700">Working Date</label>
+                    <input
+                            type="date"
+                            id="workingDateOpen"
+                            name="workingDate"
+                            th:field="*{workingDate}"
+                            class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                </div>
+            </div>
+        </div>
+
+        <!-- Fixed Shift - Employee ID and Working Date -->
+        <div id="fixedShiftInputs" class="space-y-2 hidden">
+            <div class="space-y-2">
+                <label for="employeeID" class="block text-sm font-medium text-gray-700">Employee</label>
+                <select
+                        id="employeeID"
+                        name="employee"
+                        th:field="*{employee.id}"
+                        class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                    <option value="" disabled>Select an employee</option>
+                    <option th:each="employee : ${employees}"
+                            th:value="${employee.id}"
+                            th:text="${employee.name}">
+                        Employee
+                    </option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Start and End Time -->
+        <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-2">
+                <label for="startTime" class="space-y-2 block text-sm font-medium text-gray-700">Start Time</label>
+                <input
+                        name="startTime"
+                        type="time"
+                        id="startTime"
+                        th:field="*{startTime}"
+                        class="w-full p-2 border border-gray-300 rounded"
+                >
+            </div>
+            <div class="space-y-2">
+                <label for="endTime" class="block text-sm font-medium text-gray-700">End Time</label>
+                <input
+                        name="endTime"
+                        type="time"
+                        id="endTime"
+                        th:field="*{endTime}"
+                        class="w-full p-2 border border-gray-300 rounded"
+                >
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-end space-x-2 pt-4">
+            <button id="cancelButton" type="button" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors">
+                Cancel
+            </button>
+            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                Save
+            </button>
+        </div>
+    </form>
+
+    <script>
+        function handleShiftTypeChange() {
+            const shiftType = document.getElementById('shiftType').value;
+
+            document.getElementById('openShiftInputs').classList.add('hidden');
+            document.getElementById('fixedShiftInputs').classList.add('hidden');
+
+            if (shiftType === 'OPEN') {
+                document.getElementById('openShiftInputs').classList.remove('hidden');
+            } else if (shiftType === 'FIXED') {
+                document.getElementById('fixedShiftInputs').classList.remove('hidden');
+            }
+        }
+
+        handleShiftTypeChange();
+    </script>
+</div>

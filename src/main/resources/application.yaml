@@ -1,0 +1,38 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/restaurant}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:1234567890}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+  web:
+    locale: en_US
+
+cloudinary:
+  cloud_name: ${CLOUDINARY_NAME:111}
+  api_key: ${CLOUDINARY_KEY:111}
+  api_secret: ${CLOUDINARY_SECRET:111}
+  secure: true
+
+payment:
+  vnpay:
+    tmnCode: ${VNP_TMNCODE:12}
+    secretKey: ${VNP_SECRETKEY:12}
+    returnUrl: ${VNP_RETURNURL:http://localhost:8080/payment/vn-pay-callback}
+
+twilio:
+  accountSid: ${TWILIO_ACCOUNT_SID:abcd}
+  authToken: ${TWILIO_AUTH_TOKEN:abcd}
+  fromPhoneNumber: ${TWILIO_PHONE_NUMBER:abcd}

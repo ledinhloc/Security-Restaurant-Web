@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: base(~{::body})}">
+<body>
+<div th:fragment="content" class="flex-1 overflow-auto p-6">
+    <div class="bg-white rounded-lg shadow">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-semibold">Discounts</h2>
+                <div class="flex space-x-3">
+                    <a th:href="@{/discounts/create}" class="block text-center bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                        Add Discount
+                    </a>
+                </div>
+            </div>
+            <!-- Table -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            ID
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Code
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Percentage
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Max Amount
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Start Date
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            End Date
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Usage Limit
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Active
+                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody th:each="discount : ${discounts}" class="bg-white divide-y divide-gray-200">
+                    <tr class="hover:bg-gray-50">
+                        <td th:text="${discount.id}" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"></td>
+                        <td th:text="${discount.code}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                        <td th:text="${discount.percentage} + '%'" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                        <td th:text="${discount.maxAmount}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                        <td th:text="${discount.startDate}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                        <td th:text="${discount.endDate}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                        <td th:text="${discount.usageLimit}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                        <td th:text="${discount.isActive ? 'Yes' : 'No'}" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"></td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex space-x-3">
+                                <a th:href="@{/discounts/edit/{discount.id}(discount.id=${discount.id})}"
+                                   class="text-indigo-600 hover:text-indigo-900">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form th:action="@{/discounts/delete/{id}(id=${discount.id})}" method="GET" class="inline" onsubmit="return confirm('Are you sure you want to delete this discount?');">
+                                    <button type="submit" class="text-red-600 hover:text-red-900">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="discountModal" class="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 items-center justify-center"
+         th:classappend="${modalStatus == 'open' ? '' : ' hidden'}">
+        <div th:replace="~{fragments/modals/discount-input-modal}"></div>
+    </div>
+</div>
+<script>
+    document.getElementById('cancelButton').addEventListener('click', () => {
+        document.getElementById('discountModal').classList.add('hidden');
+    })
+</script>
+</body>
+</html>

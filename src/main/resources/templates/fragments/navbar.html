@@ -1,0 +1,32 @@
+<!-- fragments/navbar.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="navbar" class="w-64 bg-white shadow-lg">
+  <div class="p-4">
+    <div class="flex items-center space-x-2">
+      <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+        <span class="text-white font-bold">K</span>
+      </div>
+      <span class="text-xl font-bold text-gray-800">KANBAN</span>
+    </div>
+  </div>
+  <nav class="mt-8">
+    <a th:each="menuItem : ${menuItems}"
+       th:href="${menuItem.link}"
+       th:class="${menuItem.active} ? 'flex items-center px-4 py-3 text-blue-500 bg-blue-50' : 'flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100'">
+      <i th:class="${menuItem.icon} + ' w-6'"></i>
+      <span th:text="${menuItem.name}">Menu Item</span>
+    </a>
+  </nav>
+  <div class="absolute bottom-0 w-64 border-t border-gray-200">
+    <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100">
+      <i class="fas fa-cog w-6"></i>
+      <span>Settings</span>
+    </a>
+    <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100">
+      <i class="fas fa-sign-out-alt w-6"></i>
+      <span>Log Out</span>
+    </a>
+  </div>
+</div>
+</html>

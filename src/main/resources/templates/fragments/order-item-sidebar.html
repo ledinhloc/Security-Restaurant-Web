@@ -1,0 +1,51 @@
+<!-- Order Section -->
+<div th:fragment="order-item-sidebar"
+     class="md:w-1/3 bg-white p-6 rounded-lg shadow-md md:max-w-96 border-t md:border-l border-gray-200 flex flex-col md:h-full z-50"
+     xmlns:sec="http://www.w3.org/1999/xhtml">
+    <!-- Hidden field to store Order ID -->
+    <input type="hidden" id="orderId" name="orderId" th:value="${orderId}" />
+    <!-- Order Header -->
+    <div class="p-4 md:p-6 border-b border-gray-200">
+        <h2 class="text-xl md:text-2xl font-semibold mb-1 md:mb-2">Current Order</h2>
+        <h2 class="text-base md:text-1xl font-semibold mb-1 md:mb-2">Table 2</h2>
+        <a th:href="@{/orders/menu(orderId=${orderId})}">View Menu</a>
+    </div>
+    <!-- Order Items -->
+    <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 md:space-y-4">
+        <div th:each="cartItem : ${cart}" class="flex items-center justify-between">
+            <div class="flex items-center space-x-2 md:space-x-4">
+                <img th:src="@{${cartItem.dish.image}}" th:alt="${cartItem.dish.name}" class="w-10 h-10 md:w-12 md:h-12 rounded-lg">
+                <div>
+                    <h4 class="font-medium text-sm md:text-base" th:text="${cartItem.dish.name}"></h4>
+                    <p class="text-gray-500 text-xs md:text-sm" th:text="'$' + ${cartItem.price}"></p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-1 md:space-x-2">
+                <form th:action="@{/orders/update}" method="post" class="inline">
+                    <input type="hidden" name="orderId" th:value="${orderId}" />
+                    <input type="hidden" name="orderItemId" th:value="${cartItem.id}" />
+                    <button type="submit" name="action" value="decrease" class="w-5 h-5 md:w-6 md:h-6 bg-gray-100 rounded-lg hover:bg-gray-200 text-xs md:text-base">-</button>
+                </form>
+                <span class="text-sm md:text-base" th:text="${cartItem.quantity}"></span>
+                <form th:action="@{/orders/update}" method="post" class="inline">
+                    <input type="hidden" name="orderId" th:value="${orderId}" />
+                    <input type="hidden" name="orderItemId" th:value="${cartItem.id}" />
+                    <button type="submit" name="action" value="increase" class="w-5 h-5 md:w-6 md:h-6 bg-gray-100 rounded-lg hover:bg-gray-200 text-xs md:text-base">+</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Summary - Fixed at bottom -->
+    <div class="border-t border-gray-400 p-3 md:p-4 bg-white">
+        <div class="space-y-2 md:space-y-3">
+            <div class="flex justify-between pt-2 md:pt-3">
+                <span class="font-semibold text-sm md:text-base">Total</span>
+                <span class="font-semibold text-sm md:text-base" th:text="'$' + ${total}"></span>
+            </div>
+        </div>
+        <a th:href="@{/orders/checkout(orderId=${orderId})}" class="block text-center w-full bg-blue-500 text-white py-2 md:py-3 rounded-lg font-medium mt-3 md:mt-4 hover:bg-blue-600 transition-colors text-sm md:text-base">
+            Continue to Payment
+        </a>
+    </div>
+</div>

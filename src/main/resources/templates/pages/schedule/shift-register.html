@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: base(~{::body})}">
+<body class="bg-gray-50 antialiased">
+<div class="container mx-auto px-4 py-8 max-w-6xl">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Loop through shifts -->
+    <div th:each="shift : ${availbleShifts}" class="bg-white shadow-lg rounded-xl overflow-hidden transform transition hover:scale-105 hover:shadow-xl duration-300">
+      <div class="p-6">
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <!-- Display the shift status dynamically -->
+            <span th:text="Status" class="text-xs font-semibold uppercase tracking-wide bg-green-50 px-2 py-1 rounded-full"></span>
+            <h2 class="text-xl font-bold text-gray-900 mt-2" th:text="${shift.shiftName}"></h2>
+          </div>
+          <div class="text-right">
+            <p class="text-sm text-gray-500" th:text="'Shift #' + ${shift.shiftId}"></p>
+            <p class="text-sm text-gray-500" th:text="${shift.workingDate}"></p>
+          </div>
+        </div>
+
+        <div class="border-t border-b py-4 my-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Time</p>
+              <div class="flex items-center space-x-2">
+                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="font-medium" th:text="${shift.startTime} + ' - ' + ${shift.endTime}"></span>
+              </div>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Availability</p>
+              <div class="flex items-center space-x-2">
+                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+                <span class="font-medium" th:text="${shift.available}"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex space-x-4">
+          <!-- Subscribe to Shift -->
+          <form th:action="@{/shifts/register/{shiftId}(shiftId=${shift.shiftId})}" method="post" class="flex-1">
+            <button type="submit"
+                    class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center space-x-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>Subscribe</span>
+            </button>
+          </form>
+
+<!--          &lt;!&ndash; Cancel Shift Registration &ndash;&gt;-->
+<!--          <form th:action="@{/shifts/cancel/{scheduleId}(scheduleId=${shift.scheduleId})}" method="post" class="flex-1">-->
+<!--            <button type="submit"-->
+<!--                    class="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition duration-300 flex items-center justify-center space-x-2">-->
+<!--              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">-->
+<!--                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>-->
+<!--              </svg>-->
+<!--              <span>Cancel</span>-->
+<!--            </button>-->
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

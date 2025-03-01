@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - Restaurant Management</title>
+    <!-- Sử dụng Tailwind CSS qua CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-900 font-sans text-gray-200 antialiased">
+
+<!-- Container -->
+<div class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-4xl bg-white p-8 rounded-lg shadow-lg flex">
+        <!-- Nửa trái chứa hình ảnh -->
+        <div class="w-1/2">
+            <img src="https://limody.vn/wp-content/uploads/2020/10/mon-ngon-quan-1-13.jpg?v=1603081882" alt="Restaurant Image"
+                 class="w-full h-full object-cover rounded-lg shadow-md">
+        </div>
+
+        <!-- Nửa phải chứa form -->
+        <div class="w-1/2 pl-8">
+            <h2 class="text-3xl font-bold text-center text-blue-500 mb-6">Create Your Account</h2>
+
+            <!-- Form đăng ký -->
+            <form action="/register" method="post">
+                <!-- First Name -->
+                <div class="mb-4">
+                    <label for="firstName" class="block text-gray-700 font-semibold text-sm mb-2">First Name</label>
+                    <input type="text" id="firstName" name="firstName" placeholder="Enter your first name"
+                           class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+
+                <!-- Last Name -->
+                <div class="mb-4">
+                    <label for="lastName" class="block text-gray-700 font-semibold text-sm mb-2">Last Name</label>
+                    <input type="text" id="lastName" name="lastName" placeholder="Enter your last name"
+                           class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-4">
+                    <label for="email" class="block text-gray-700 font-semibold text-sm mb-2">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email"
+                           class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+
+                <!-- Phone Number -->
+                <div class="mb-4">
+                    <label for="phone" class="block text-gray-700 font-semibold text-sm mb-2">Phone Number</label>
+                    <input type="text" id="phone" name="phone" placeholder="Enter your phone number"
+                           class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+
+                <!-- Address -->
+                <div class="mb-4">
+                    <label for="address" class="block text-gray-700 font-semibold text-sm mb-2">Address</label>
+                    <input type="text" id="address" name="address" placeholder="Enter your address"
+                           class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+
+                <!-- Date of Birth -->
+                <div class="mb-4">
+                    <label for="dateOfBirth" class="block text-gray-700 font-semibold text-sm mb-2">Date of Birth</label>
+                    <input type="date" id="dateOfBirth" name="dateOfBirth"
+                           class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+
+                <!-- Password -->
+                <div class="mb-6">
+                    <label for="password" class="block text-gray-700 font-semibold text-sm mb-2">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter your password"
+                           class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="mb-4">
+                    <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transition duration-300">Create Account</button>
+                </div>
+            </form>
+
+            <!-- Thông báo lỗi hoặc thành công -->
+            <div class="mt-4">
+                <p class="text-red-400 text-center" th:text="${error}"></p>
+                <p class="text-green-400 text-center" th:text="${message}"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: base(~{::body})}">
+<body>
+<div th:fragment="content" class="flex-1 overflow-auto p-6">
+    <div class="container mx-auto p-6 bg-gray-100">
+
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-700">Restaurant Dashboard</h1>
+            <p class="text-gray-500">Manage your restaurant's operations with ease</p>
+        </div>
+
+        <!-- Date Range Selector -->
+        <div class="mb-6 flex justify-center">
+            <div class="flex items-center space-x-4">
+                <form method="post" th:action="@{/dashboard}">
+                    <label for="start-date" class="text-lg">From:</label>
+                    <input type="date" id="start-date" name="startDate" class="px-4 py-2 border rounded-md" th:value="${startDate}" required>
+
+                    <label for="end-date" class="text-lg">To:</label>
+                    <input type="date" id="end-date" name="endDate" class="px-4 py-2 border rounded-md" th:value="${endDate}" required>
+
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">Filter</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 mb-8">
+            <!-- Revenue and Profit Chart -->
+            <div class="bg-white p-6 rounded-lg shadow-lg col-span-1 md:col-span-2">
+                <h3 class="text-lg font-semibold mb-4">Profit and revenue</h3>
+                <canvas id="revenueProfitChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Grid Layout for Dashboard Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <!-- Revenue Chart -->
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold mb-4">Order</h3>
+                <canvas id="orderChart"></canvas>
+            </div>
+
+            <!-- Top Dishes -->
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold mb-4">Dish</h3>
+                <canvas id="dishChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Reservations Chart -->
+        <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
+            <h3 class="text-lg font-semibold mb-4">Reservations</h3>
+            <canvas id="reservationsChart"></canvas>
+        </div>
+
+        <!-- Table with Restaurant Performance -->
+        <table class="min-w-full bg-white border border-gray-300 rounded-lg shadow-lg mb-6 ">
+            <thead class="bg-gray-200">
+            <tr>
+                <th class="px-4 py-2 text-left text-gray-700 font-semibold">Dish Name</th>
+                <th class="px-4 py-2 text-left text-gray-700 font-semibold">Quantity Sold</th>
+                <th class="px-4 py-2 text-left text-gray-700 font-semibold">Total Sales</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Duyệt qua danh sách dishSalesStats -->
+            <tr th:each="stat : ${dishSalesStats}">
+                <td class="px-4 py-2 border-b text-gray-700" th:text="${stat[0]}"></td>
+                <td class="px-4 py-2 border-b text-gray-700" th:text="${stat[1]}"></td>
+                <td class="px-4 py-2 border-b text-gray-700" th:text="${stat[2]}"></td>
+<!--                <td class="px-4 py-2 border-b text-gray-700" th:text="${#numbers.formatDecimal(stat[2], 2, 'POINT')}"></td>-->
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- Inventory Overview -->
+        <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
+            <h3 class="text-lg font-semibold mb-4">Inventory Status</h3>
+            <canvas id="inventoryChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Chart.js Script -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:inline="javascript">
+        // bieu do reservation the hien cac trang thai theo ngay
+        let reservationData = /*[[${reservationData}]]*/ {}; // Dữ liệu từ model
+        // let reservationData = [
+        //     ["2024-12-05", "CONFIRMED", 3],
+        //     ["2024-12-06", "CANCELLED", 2],
+        //     ["2024-12-06", "PENDING", 7],
+        //     ["2024-12-07", "PENDING", 1]
+        // ];
+
+        // Chuẩn bị dữ liệu cho biểu đồ
+        let dates = [];
+        let confirmedCounts = [];
+        let cancelledCounts = [];
+        let pendingCounts = [];
+        let finishedCounts = [];
+
+        // Tạo một đối tượng chứa số lượng trạng thái cho từng ngày
+        let statusMap = {};
+
+        // Xử lý dữ liệu từ database
+        reservationData.forEach(function (entry) {
+            let date = entry[0]; // Ngày
+            let status = entry[1]; // Trạng thái
+            let count = entry[2]; // Số lượng
+
+            // Đảm bảo ngày có trong statusMap
+            if (!statusMap[date]) {
+                statusMap[date] = {
+                    CONFIRMED: 0,
+                    CANCELLED: 0,
+                    PENDING: 0,
+                    FINISHED: 0
+                };
+            }
+
+            // Cập nhật số lượng theo trạng thái
+            statusMap[date][status] = count;
+        });
+
+        // Lấy các ngày duy nhất và sắp xếp theo thứ tự
+        let allDates = Object.keys(statusMap);
+        allDates.sort();
+
+        // Cập nhật dữ liệu biểu đồ
+        allDates.forEach(function (date) {
+            dates.push(date);
+            confirmedCounts.push(statusMap[date].CONFIRMED);
+            cancelledCounts.push(statusMap[date].CANCELLED);
+            pendingCounts.push(statusMap[date].PENDING);
+            finishedCounts.push(statusMap[date].FINISHED);
+        });
+
+        // Vẽ biểu đồ
+        let ctxa = document.getElementById('reservationsChart').getContext('2d');
+        let statusChart = new Chart(ctxa, {
+            type: 'line',
+            data: {
+                labels: dates, // Các ngày làm trục hoành
+                datasets: [{
+                    label: 'CONFIRMED',
+                    data: confirmedCounts, // Số lượng 'CONFIRMED'
+                    borderColor: '#4CAF50',
+                    fill: false,
+                    tension: 0.1
+                }, {
+                    label: 'CANCELLED',
+                    data: cancelledCounts, // Số lượng 'CANCELLED'
+                    borderColor: '#FF5252',
+                    fill: false,
+                    tension: 0.1
+                }, {
+                    label: 'PENDING',
+                    data: pendingCounts, // Số lượng 'PENDING'
+                    borderColor: '#FF9800',
+                    fill: false,
+                    tension: 0.1
+                }, {
+                    label: 'FINISHED',
+                    data: finishedCounts, // Số lượng 'FINISHED'
+                    borderColor: '#673AB7',
+                    fill: false,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Count'
+                        }
+                    }
+                }
+            }
+        });
+
+        // bieu do doanh thu , loi nhuan
+        const revenueAndProfit = /*[[${revenueAndProfit}]]*/ {};
+        // // Dữ liệu ví dụ
+        // const labels2 = ['2024-12-01', '2024-12-02', '2024-12-03', '2024-12-04', '2024-12-05']; // Ngày
+        // const costData = [1500, 1600, 1700, 1800, 2000]; // Tổng chi phí nguyên liệu
+        // const revenueData = [500, 600, 700, 800, 1000]; // Lợi nhuận
+
+        // Dữ liệu ví dụ
+        const labels2 = revenueAndProfit.dates; // Ngày
+        const costData = revenueAndProfit.totalCosts; // Tổng chi phí
+        const revenueData = revenueAndProfit.totalRevenues; // Tổng doanh thu
+
+        // Lấy đối tượng canvas
+        const ctx2 = document.getElementById('revenueProfitChart').getContext('2d');
+
+        // Vẽ biểu đồ đường
+        const revenueProfitChart = new Chart(ctx2, {
+            type: 'line', // Chọn loại biểu đồ đường
+            data: {
+                labels: labels2, // Các nhãn (ngày)
+                datasets: [
+                    {
+                        label: 'Tổng chi phí', // Nhãn cho đường chi phí nguyên liệu
+                        data: costData, // Dữ liệu chi phí nguyên liệu
+                        borderColor: 'rgba(255, 99, 132, 1)', // Màu đường chi phí nguyên liệu
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)', // Màu nền
+                        fill: false, // Không điền màu vào giữa các điểm
+                        tension: 0.1 // Độ cong của đường
+                    },
+                    {
+                        label: 'Lợi nhuận', // Nhãn cho đường lợi nhuận
+                        data: revenueData, // Dữ liệu lợi nhuận
+                        borderColor: 'rgba(54, 162, 235, 1)', // Màu đường lợi nhuận
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)', // Màu nền
+                        fill: false, // Không điền màu vào giữa các điểm
+                        tension: 0.1 // Độ cong của đường
+                    }
+                ]
+            },
+            options: {
+                responsive: true, // Đảm bảo biểu đồ đáp ứng với kích thước màn hình
+                plugins: {
+                    legend: {
+                        position: 'top', // Vị trí của legend
+                    },
+                    tooltip: {
+                        mode: 'index', // Chế độ hiển thị tooltip
+                        intersect: false, // Tooltip xuất hiện khi di chuột trên một đường
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true, // Bắt đầu trục y từ 0
+                        title: {
+                            display: true,
+                            text: 'Giá trị' // Tiêu đề trục y
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Ngày' // Tiêu đề trục x
+                        }
+                    }
+                }
+            }
+        });
+
+        // bieu do orderStats
+        const orderStats = /*[[${orderStats}]]*/ {};
+        // Chuyển đổi dữ liệu để vẽ biểu đồ
+        const labels = Object.keys(orderStats); // Các ngày
+        const data = Object.values(orderStats); // Số lượng đơn hàng
+
+        // Vẽ biểu đồ
+        const ctx = document.getElementById('orderChart').getContext('2d');
+        const orderChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Số lượng đơn hàng',
+                    data: data,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.1
+                }]
+            }
+        });
+
+        //bieu do dish ban chay nhat
+
+        function generateRandomColors(num) {
+            const colors = [];
+            for (let i = 0; i < num; i++) {
+                // Tạo các màu có độ sáng khác nhau và phân bố rộng hơn
+                const r = Math.floor(Math.random() * 256);  // Đỏ
+                const g = Math.floor(Math.random() * 256);  // Xanh lá
+                const b = Math.floor(Math.random() * 256);  // Xanh dương
+
+                // Tăng độ tương phản bằng cách đảm bảo rằng màu sắc có sự phân biệt rõ ràng
+                const rgba = `rgba(${r}, ${g}, ${b}, 0.7)`;  // Giảm độ trong suốt xuống một chút để dễ nhìn hơn
+                colors.push(rgba);
+            }
+            return colors;
+        }
+
+        const dishStats = /*[[${dishStats}]]*/ {};
+        const ctx1 = document.getElementById('dishChart').getContext('2d');
+        const orderChart1 = new Chart(ctx1, {
+            type: 'pie',
+            data: {
+                labels:  Object.keys(dishStats),
+                datasets: [{
+                    label: 'Số lượng đơn hàng',
+                    data: Object.values(dishStats),
+                    borderColor: 'rgba(230, 230, 250, 1)',
+                    backgroundColor: generateRandomColors(Object.keys(dishStats).length),
+                    tension: 0.1
+                }]
+            }
+        });
+
+        // Inventory Chart
+        let inventoryData = /*[[${inventoryData}]]*/ [];
+
+        // Tách dữ liệu thành các mảng riêng
+        let itemNames = inventoryData.map(item => item[0]); // Lấy tên mặt hàng
+        let quantities = inventoryData.map(item => item[1]); // Lấy số lượng hàng tồn kho
+
+        // Vẽ biểu đồ
+        let ctxInventory = document.getElementById('inventoryChart').getContext('2d');
+        new Chart(ctxInventory, {
+            type: 'bar',
+            data: {
+                labels: itemNames, // Tên mặt hàng
+                datasets: [{
+                    label: 'Số lượng hàng tồn kho',
+                    data: quantities, // Số lượng
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // Màu cột
+                    borderColor: 'rgba(54, 162, 235, 1)', // Màu viền
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tên mặt hàng'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Số lượng'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                }
+            }
+        });
+    </script>
+</div>
+</body>
+</html>

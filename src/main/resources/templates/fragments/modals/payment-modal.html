@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Modal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+<div th:fragment="payment-modal" id="paymentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+    <div
+            class="relative top-5 mx-auto p-5 border w-11/12 md:w-4/5 lg:w-3/4 xl:w-2/3 shadow-lg rounded-lg bg-white">
+        <!-- Modal Header -->
+        <div class="flex justify-between items-center border-b pb-4">
+            <h3 class="text-2xl font-bold text-gray-800">Complete Your Order</h3>
+            <button id="closeButton" class="text-gray-400 hover:text-gray-500">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <!-- Modal Content -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <!-- Left Column - Order Summary -->
+            <div class="bg-gray-50 p-6 rounded-lg">
+                <!-- Promo Code Input -->
+                <div class="mb-4">
+                    <div class="flex space-x-2">
+                        <input
+                                type="text"
+                                id="promoInput"
+                                placeholder="Enter promo code"
+                                class="flex-1 px-4 py-2 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        <button
+                                id="applyPromoButton"
+                                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                            Apply
+                        </button>
+                    </div>
+                    <p id="promoMessage" class="text-sm mt-1 hidden"></p>
+                </div>
+
+                <h4 class="text-lg font-semibold mb-4">Order Summary</h4>
+                <!-- Order Items -->
+                <div id="orderSummary" class="space-y-4 mb-6 max-h-64 overflow-y-auto">
+
+                </div>
+
+                <!-- Order Details -->
+                <div class="space-y-2 text-sm border-t pt-4 overflow-y-auto">
+                    <div class="flex justify-between">
+                        <p class="text-gray-600">Subtotal</p>
+                        <p id="subtotal" class="font-medium">$48.21</p>
+                    </div>
+                    <div class="flex justify-between">
+                        <p class="text-gray-600">Tax (10%)</p>
+                        <p id="tax" class="font-medium">$4.82</p>
+                    </div>
+                    <div class="flex justify-between">
+                        <p class="text-gray-600">Discount (WELCOME10)</p>
+                        <p id="discount" class="font-medium text-green-600">-$4.82</p>
+                    </div>
+                    <div class="flex justify-between text-lg font-bold pt-4 border-t">
+                        <p>Total</p>
+                        <p id="totalSummary">$48.21</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Payment Methods -->
+            <div class="space-y-6">
+                <!-- Payment Methods -->
+                <div id="paymentOptions">
+                    <h4 class="text-lg font-semibold mb-4">Select Payment Method</h4>
+                    <!-- Cash Option -->
+                    <div
+                            data-method="CASH"
+                            class="border border-blue-500 bg-blue-50 rounded-lg p-4 mb-3 cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                        <div class="flex items-center space-x-3">
+                            <div class="flex-shrink-0">
+                                <svg
+                                        class="w-6 h-6 text-green-600"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                    <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="font-medium">Cash</p>
+                                <p class="text-sm text-gray-500">Pay with cash upon delivery/pickup</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- VNPay Option -->
+                    <div
+                            data-method="VNPAY"
+                            class="border rounded-lg p-4 mb-3 cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                        <div class="flex items-center space-x-3">
+                            <div class="flex-shrink-0">
+                                <img src="/api/placeholder/24/24" alt="VNPay" class="w-6 h-6" />
+                            </div>
+                            <div>
+                                <p class="font-medium">VNPay</p>
+                                <p class="text-sm text-gray-500">Pay securely with VNPay</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Momo Option -->
+                    <div
+                            data-method="MOMO"
+                            class="border rounded-lg p-4 cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                        <div class="flex items-center space-x-3">
+                            <div class="flex-shrink-0">
+                                <img src="/api/placeholder/24/24" alt="Momo" class="w-6 h-6" />
+                            </div>
+                            <div>
+                                <p class="font-medium">Momo</p>
+                                <p class="text-sm text-gray-500">Pay with Momo e-wallet</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Place Order Button -->
+                <button
+                        id="nextButton"
+                        class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                    Place Order
+                </button>
+
+            </div>
+        </div>
+    </div>
+    <script>
+        let selectedPaymentMethod = null;
+        document.getElementById('paymentOptions').addEventListener('click', function(event) {
+            const option = event.target.closest('.border.cursor-pointer');
+            if (option) {
+                [...this.children].forEach(child => child.classList.remove('border-blue-500', 'bg-blue-50'));
+                option.classList.add('border-blue-500', 'bg-blue-50');
+                selectedPaymentMethod = option.getAttribute('data-method');
+            }
+        });
+    </script>
+</div>
+
+</body>

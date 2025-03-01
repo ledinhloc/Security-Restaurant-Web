@@ -1,0 +1,127 @@
+<div th:fragment="customer-modal" class="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md  overflow-y-auto">
+    <h2 id="modalTitle"
+        class="text-xl font-semibold mb-6">Employee</h2>
+    <form id="modalForm" method="post" action="employees/add" >
+        <!-- Image Upload Area -->
+<!--        <div-->
+<!--                id="dropZone"-->
+<!--                class="mb-6 flex items-center gap-6"-->
+<!--                ondrop="dropHandler(event)"-->
+<!--                ondragover="dragOverHandler(event)"-->
+<!--                ondragleave="dragLeaveHandler(event)">-->
+<!--            <input-->
+<!--                    type="file"-->
+<!--                    name="file"-->
+<!--                    id="fileInput"-->
+<!--                    class="hidden"-->
+<!--                    accept="image/*"-->
+<!--                    onchange="handleFileSelect(event)">-->
+
+
+<!--            &lt;!&ndash; Image preview container &ndash;&gt;-->
+<!--            <div class="w-32 h-32 ml-12 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center relative">-->
+<!--                <img id="previewImg" class="w-full h-full object-cover rounded-lg hidden">-->
+<!--            </div>-->
+
+<!--            &lt;!&ndash; Text container &ndash;&gt;-->
+<!--            <div class="flex flex-col items-center">-->
+<!--                <span class="text-gray-500 mb-2">Drag image here</span>-->
+<!--                <span class="text-gray-500 mb-2">or</span>-->
+<!--                <button type="button"-->
+<!--                        onclick="document.getElementById('fileInput').click()"-->
+<!--                        class="text-blue-500 hover:text-blue-600">-->
+<!--                    Browse image-->
+<!--                </button>-->
+<!--            </div>-->
+<!--        </div>-->
+
+        <!-- Form Fields -->
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
+                <input
+                        name="itemName"
+                        type="text"
+                        placeholder="Enter name"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Unit</label>
+                <input
+                        name="unit"
+                        type="text"
+                        placeholder="Enter unit"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1"> Quantity</label>
+                <input
+                        name="quantity"
+                        type="text"
+                        placeholder="Enter quantity"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">UnitPrice</label>
+                <input
+                        name="unitPrice"
+                        type="text"
+                        placeholder="Enter unit price"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />
+
+            </div>
+<!--            <div>-->
+<!--                <label class="block text-sm font-medium text-gray-700 mb-1">SupplierId</label>-->
+<!--                <input-->
+<!--                        name="supplierId"-->
+<!--                        type="text"-->
+<!--                        placeholder="Enter supplier id"-->
+<!--                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />-->
+<!--            </div>-->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
+                <select
+                        name="supplier"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+
+                    <!-- Ví dụ tĩnh cho nhà cung cấp -->
+<!--                    <option value="1">Supplier Name 1</option>-->
+<!--                    <option value="2">Supplier Name 2</option>-->
+<!--                    <option value="3">Supplier Name 3</option>-->
+
+                    <!-- Ví dụ động: Lặp qua danh sách nhà cung cấp -->
+
+                    <th:block th:each="supplier : ${suppliers}">
+                        <option th:value="${supplier.supplierId}" th:text="${supplier.name}"></option>
+                    </th:block>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <input
+                        name="description"
+                        type="text"
+                        placeholder="Enter description"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-end space-x-3 mt-6">
+            <button onclick="closeModal()" type="button" class="px-4 py-2 text-gray-600 hover:text-gray-800">Discard</button>
+            <button
+                    type="submit"
+                    id="actionButton"
+                    class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                Add Inventory
+            </button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

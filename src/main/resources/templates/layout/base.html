@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml"
+      th:fragment="base (content)">
+<head>
+  <title>My Website</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.1/css/all.min.css" integrity="sha512-5Hs3dF2AEPkpNAR7UiOHba+lRSJNeM2ECkwxUIxC1Q/FLycGTbNapWXB4tP889k5T5Ju8fs4b1P5z/iB4nMfSQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />  <script src="https://unpkg.com/feather-icons"></script>
+  <script th:src="@{/js/Modal.js}"></script>
+</head>
+<body class="bg-gray-100">
+<div class="flex h-screen">
+  <!-- Include Header Fragment -->
+  <div sec:authorize="hasRole('ADMIN')" th:replace="~{fragments/sidebar :: sidebar}"></div>
+  <div sec:authorize="hasRole('STAFF')" th:replace="~{fragments/employee-sidebar :: employee-sidebar}"></div>
+  <div sec:authorize="hasRole('CHEF')" th:replace="~{fragments/employee-sidebar :: employee-sidebar}"></div>
+  <div sec:authorize="hasRole('CUSTOMER')" th:replace="~{fragments/customer-sidebar :: customer-sidebar}"></div>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col overflow-scroll">
+    <!-- Top Bar -->
+    <div sec:authorize="hasRole('ADMIN')" th:replace="~{fragments/topbar :: topbar}"></div>
+    <!-- Content Area -->
+    <div th:replace="${content}">
+      <!-- Content will be inserted here -->
+    </div>
+  </div>
+</div>
+<!--&lt;!&ndash; Include Footer Fragment &ndash;&gt;-->
+<!--<div th:replace="fragments/footer :: footer"></div>-->
+<!--<th:block th:replace="~{::page-scripts}" th:remove="tag"/>-->
+
+</body>
+</html>

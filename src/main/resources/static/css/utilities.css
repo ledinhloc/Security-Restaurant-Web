@@ -1,0 +1,37 @@
+@tailwind utilities;
+
+.form-title {
+    @apply text-xl font-semibold mb-6;
+}
+
+.drop-zone {
+    @apply mb-6 border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-gray-400;
+}
+
+.image-preview {
+    @apply w-32 h-32 mx-auto border border-gray-300 rounded-lg flex items-center justify-center;
+}
+
+.upload-text {
+    @apply text-gray-400;
+}
+
+.browse-btn {
+    @apply text-blue-500 hover:text-blue-600;
+}
+
+.form-label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+}
+
+.form-input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500;
+}
+
+.btn-secondary {
+    @apply px-4 py-2 text-gray-600 hover:text-gray-800;
+}
+
+.btn-primary {
+    @apply px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}

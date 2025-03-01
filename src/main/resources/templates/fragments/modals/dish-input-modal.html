@@ -1,0 +1,143 @@
+<div th:fragment="dish-modal" class="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md  overflow-y-auto">
+  <h2 id="modalTitle"
+      class="text-xl font-semibold mb-6">Dish</h2>
+  <form id="modalForm" method="post" action="dishes/add" enctype="multipart/form-data">
+    <!-- Image Upload Area -->
+    <div
+            id="dropZone"
+            class="mb-6 flex items-center gap-6"
+            ondrop="dropHandler(event)"
+            ondragover="dragOverHandler(event)"
+            ondragleave="dragLeaveHandler(event)">
+      <input
+              type="file"
+              name="file"
+              id="fileInput"
+              class="hidden"
+              accept="image/*"
+              onchange="handleFileSelect(event)">
+
+      <!-- Image preview container -->
+      <div class="w-32 h-32 ml-12 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center relative">
+        <img id="previewImg" class="w-full h-full object-cover rounded-lg hidden">
+      </div>
+
+      <!-- Text container -->
+      <div class="flex flex-col items-center">
+        <span class="text-gray-500 mb-2">Drag image here</span>
+        <span class="text-gray-500 mb-2">or</span>
+        <button type="button"
+                onclick="document.getElementById('fileInput').click()"
+                class="text-blue-500 hover:text-blue-600">
+          Browse image
+        </button>
+      </div>
+    </div>
+
+    <!-- Form Fields -->
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Dish Name</label>
+        <input
+                name="name"
+                type="text"
+                placeholder="Enter dish name"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Dish Description</label>
+        <input
+                name="description"
+                type="text"
+                placeholder="Enter dish description"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Dish Price</label>
+        <input
+                name="price"
+                type="number" step="0.01"
+                placeholder="Enter dish price"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+        <select
+                name="category.id"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+          <option value="" disabled selected>Select Category</option>
+          <option th:each="cate : ${categories}" th:value="${cate.id}" th:text="${cate.name}"></option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex justify-end space-x-3 mt-6">
+      <button onclick="closeModal()" type="button" class="px-4 py-2 text-gray-600 hover:text-gray-800">Discard</button>
+      <button
+              type="submit"
+              id="actionButton"
+              class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+        Add Dish
+      </button>
+    </div>
+  </form>
+</div>
+<script>
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach((eventName) => {
+    document.getElementById('dropZone').addEventListener(eventName, preventDefaults, false);
+  });
+
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  function dropHandler(event) {
+    const dt = event.dataTransfer;
+    const files = dt.files;
+
+    handleFiles(files);
+    document.getElementById('dropZone').classList.remove('border-blue-500');
+  }
+
+  function dragOverHandler(event) {
+    document.getElementById('dropZone').classList.add('border-blue-500');
+  }
+
+  function dragLeaveHandler(event) {
+    document.getElementById('dropZone').classList.remove('border-blue-500');
+  }
+
+  function handleFileSelect(event) {
+    const files = event.target.files;
+    handleFiles(files);
+  }
+
+  function handleFiles(files) {
+    if (files.length > 0) {
+      const file = files[0];
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          const previewImg = document.getElementById('previewImg');
+          const uploadText = document.getElementById('uploadText');
+
+          previewImg.src = e.target.result;
+          previewImg.classList.remove('hidden');
+          uploadText.classList.add('hidden');
+        };
+
+        reader.readAsDataURL(file);
+      } else {
+        alert('Please upload an image file');
+      }
+    }
+  }
+</script>
+</body>
+</html>

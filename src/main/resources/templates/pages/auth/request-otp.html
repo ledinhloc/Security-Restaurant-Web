@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request OTP</title>
+    <!-- Sử dụng Tailwind CSS qua CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100">
+
+<!-- Centered Container -->
+<div class="container mx-auto mt-20 p-4">
+    <div class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-lg">
+        <!-- Header -->
+        <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">Request OTP</h2>
+
+        <!-- OTP Request Form -->
+        <form action="/request-otp" method="post" class="space-y-4">
+            <div>
+                <label for="phoneNumber" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                <input type="text" name="phoneNumber" id="phoneNumber" placeholder="Enter your phone number"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                Send OTP
+            </button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

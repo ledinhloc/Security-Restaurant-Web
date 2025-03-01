@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Scheduling Config</title>
+    <script>
+        let shifts = [];
+        fetch('/shifts/list')
+            .then(response => response.json())
+            .then(data => {
+                shifts = data.map(item => item.shiftName);
+            })
+            .catch(error => console.error('Error:', error));
+
+        let startDate = "2024-12-01";
+        let cols = 7;
+        let defaultValue = 3;
+
+        const matrixConfigs = {
+            matrices: [
+                {
+                    id: "staff-matrix",
+                    defaultValueInputId: "staff-matrix-default-value",
+                },
+                {
+                    id: "chef-matrix",
+                    defaultValueInputId: "chef-matrix-default-value",
+                },
+            ],
+        };
+
+        function calculateDates(startDate, numDays) {
+            const dates = [];
+            const start = new Date(startDate);
+            for (let i = 0; i < numDays; i++) {
+                const date = new Date(start);
+                date.setDate(start.getDate() + i);
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                dates.push(`${day}-${month}`);
+            }
+            return dates;
+        }
+
+        function renderMatrix(matrix) {
+            const dates = calculateDates(startDate, cols);
+            const id = matrix.id;
+
+            // Render table head
+            const tableHead = document.querySelector(`#${id} .matrix-head`);
+            tableHead.innerHTML = `<th class="bg-gray-100">Shift</th>` +
+                dates.map(date => `<th class="w-24 bg-gray-100 py-2 px-2 text-sm font-semibold text-gray-700">${date}</th>`).join("");
+
+            // Render table body
+            const tableBody = document.querySelector(`#${id} .matrix-body`);
+            tableBody.innerHTML = shifts
+                .map((shift, rowIndex) => {
+                    const row = `<td class="w-24 bg-gray-100 py-2 px-2 text-sm font-semibold text-gray-700">${shift}</td>` +
+                        Array.from({ length: cols }).map((_, colIndex) =>
+                            `<td><input type="text" class="w-24 border w-full text-center py-1 rounded focus:ring-2 focus:ring-blue-400"
+                                    value="${defaultValue}"
+                                    data-matrix="${id}"
+                                    data-row="${rowIndex}"
+                                    data-col="${colIndex}"
+                                    oninput="validateInput(this)"></td>`).join("");
+                    return `<tr>${row}</tr>`;
+                }).join("");
+        }
+
+        function validateInput(input) {
+            const value = input.value;
+            if (!/^\d*$/.test(value)) {
+                input.value = value.slice(0, -1);
+            }
+        }
+
+        function updateDefaultValue(matrixId) {
+            const matrix = matrixConfigs.matrices.find(m => m.id === matrixId);
+            const newDefaultValue = parseInt(document.getElementById(matrix.defaultValueInputId).value, 10);
+            if (!isNaN(newDefaultValue)) {
+                defaultValue = newDefaultValue;
+                renderMatrix(matrix);
+            }
+        }
+
+        function updateStartDate() {
+            const newStartDate = document.getElementById("start-date").value;
+            if (!newStartDate) {
+                alert("Vui lòng chọn ngày bắt đầu hợp lệ!");
+                return;
+            }
+            startDate = newStartDate;
+            matrixConfigs.matrices.forEach(renderMatrix);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            matrixConfigs.matrices.forEach(renderMatrix);
+        });
+
+        function collectMatrixData(matrixId, rows, cols) {
+            const matrix = Array.from({ length: rows }, () => Array(cols).fill(0));
+            const inputs = document.querySelectorAll(`#${matrixId} input[data-matrix="${matrixId}"]`);
+            inputs.forEach(input => {
+                const row = parseInt(input.getAttribute("data-row"), 10);
+                const col = parseInt(input.getAttribute("data-col"), 10);
+                matrix[row][col] = parseInt(input.value, 10) || 0;
+            });
+            return matrix;
+        }
+    </script>
+
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+<div class="bg-white shadow-lg rounded-lg p-6 w-full max-w-6xl space-y-6">
+    <h1 class="text-2xl font-bold text-gray-700 text-center">Auto Scheduling Config</h1>
+
+    <!-- General Settings -->
+    <div class="bg-gray-50 p-4 rounded shadow space-y-4">
+        <!-- General Options -->
+        <h2 class="font-semibold text-lg text-gray-700">General Settings</h2>
+        <form id="global-config" class="space-y-4">
+            <!-- Start Date -->
+            <div class="flex items-center">
+                <label class="text-sm font-medium text-gray-700">Start Date:</label>
+                <input oninput="updateStartDate()" type="date" id="start-date" class="ml-2 border py-2 px-4 rounded w-48" value="2024-12-01">
+            </div>
+
+            <!-- Limit Shifts per Day -->
+            <div class="flex items-center">
+                <label class="text-sm font-medium text-gray-700 mr-4">Limit Shifts per Day</label>
+                <input type="number" id="max-shift-value" class="border py-2 px-4 rounded w-24" placeholder="2">
+            </div>
+
+            <!-- Shift Deviation Limit -->
+            <div class="flex items-center">
+                <label class="text-sm font-medium text-gray-700 mr-4">Shift Deviation Limit</label>
+                <input type="number" id="max-deviation-value" class="border py-2 px-4 rounded w-24" placeholder="1">
+            </div>
+
+            <!-- Allow Two Consecutive Shifts -->
+            <div class="flex items-center">
+                <input type="checkbox" id="isConsecutiveShifts" class="mr-2">
+                <label for="isConsecutiveShifts" class="text-sm font-medium text-gray-700 mr-4">Allow Two Consecutive Shifts</label>
+            </div>
+        </form>
+    </div>
+
+    <!-- Matrices -->
+    <div class="flex gap-8">
+        <div id="staff-matrix" class="flex-1">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4 text-center">Staff Matrix</h2>
+            <div class="mb-4 flex items-center">
+                <label class="text-sm font-medium text-gray-700 mr-2">Customize Staff per Shift:</label>
+                <input type="number" id="staff-matrix-default-value" class="mr-2 border py-2 px-4 rounded w-24" oninput="updateDefaultValue('staff-matrix')">
+            </div>
+            <table class="border-collapse w-full text-center">
+                <thead>
+                <tr class="matrix-head"></tr>
+                </thead>
+                <tbody class="matrix-body"></tbody>
+            </table>
+        </div>
+
+        <div id="chef-matrix" class="flex-1">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4 text-center">Chef Matrix</h2>
+            <div class="mb-4 flex items-center">
+                <label class="text-sm font-medium text-gray-700 mr-2">Customize Chef per Shift:</label>
+                <input type="number" id="chef-matrix-default-value" class="mr-2 border py-2 px-4 rounded w-24" oninput="updateDefaultValue('chef-matrix')">
+            </div>
+            <table class="border-collapse w-full text-center">
+                <thead>
+                <tr class="matrix-head"></tr>
+                </thead>
+                <tbody class="matrix-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="text-center">
+        <button type="button" onclick="submitAll()" class="px-6 py-3 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition">
+            Submit
+        </button>
+    </div>
+</div>
+
+<script>
+    function submitAll() {
+        const staffMatrix = collectMatrixData('staff-matrix');
+        const chefMatrix = collectMatrixData('chef-matrix');
+
+        const payload = {
+            startDate: document.getElementById('start-date').value || new Date().toISOString(),
+            maxShiftPerDay: document.getElementById('max-shift-value').value || 2,
+            maxDeviationShift: document.getElementById('max-deviation-value').value || 1 ,
+            isConsecutiveShifts: document.getElementById('isConsecutiveShifts').checked ? 1: 0,
+            staffMatrix,
+            chefMatrix
+        };
+
+        console.log('Dữ liệu gửi đi:', payload);
+
+        fetch('/schedules/config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+            .then(response => {
+                if (response.ok) window.location.href = '/schedules';
+            })
+            .catch(error => console.error('Lỗi:', error));
+    }
+
+    function collectMatrixData(matrixId) {
+        const inputs = document.querySelectorAll(`#${matrixId} input[data-matrix="${matrixId}"]`);
+        const config = matrixId === 'staff-matrix' ? matrixConfigs.staffMatrix : matrixConfigs.chefMatrix;
+
+        const matrix = Array.from({ length: shifts.length }, () => Array(cols).fill(0));
+        inputs.forEach(input => {
+            const row = parseInt(input.getAttribute('data-row'), 10);
+            const col = parseInt(input.getAttribute('data-col'), 10);
+            matrix[row][col] = parseInt(input.value, 10) || 0;
+        });
+        return matrix;
+    }
+</script>
+</body>

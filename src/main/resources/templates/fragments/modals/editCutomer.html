@@ -1,0 +1,32 @@
+<div id="customerFormModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-lg font-bold mb-4" id="formTitle">Add Customer</h2>
+        <form id="customerForm" onsubmit="submitCustomer(event)">
+            <input type="hidden" id="customerId" />
+            <div class="mb-4">
+                <label class="block">Name</label>
+                <input type="text" id="customerName" required class="border border-gray-300 p-2 rounded w-full" />
+            </div>
+            <div class="mb-4">
+                <label class="block">Department</label>
+                <input type="text" id="customerDepartment" required class="border border-gray-300 p-2 rounded w-full" />
+            </div>
+            <div class="mb-4">
+                <label class="block">Email</label>
+                <input type="email" id="customerEmail" required class="border border-gray-300 p-2 rounded w-full" />
+            </div>
+            <div class="mb-4">
+                <label class="block">Phone</label>
+                <input type="text" id="customerPhone" required class="border border-gray-300 p-2 rounded w-full" />
+            </div>
+            <div class="mb-4">
+                <label class="block">Address</label>
+                <input type="text" id="customerAddress" required class="border border-gray-300 p-2 rounded w-full" />
+            </div>
+            <div class="flex justify-end">
+                <button type="button" onclick="closeForm()" class="border border-gray-400 text-gray-600 hover:bg-gray-200 py-1 px-2 rounded mr-2">Cancel</button>
+                <button type="submit" class="border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white py-1 px-2 rounded">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
