@@ -8,14 +8,12 @@ import com.restaurant.management.repository.CustomerRepository;
 import com.restaurant.management.repository.OtpRepository;
 import com.restaurant.management.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -127,5 +125,23 @@ public class AccountController {
         List<Dish> dishes = dishService.getAllDishes();
         model.addAttribute("dishes", dishes);
         return "pages/auth/homePage";
+    }
+
+    @GetMapping("/profile/{id}")
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public String showProfileFile(@PathVariable Long id, Model model) {
+        Customer customer = customerService.getCustomerById(id);
+        if (customer != null) {
+            model.addAttribute("customer", customer);
+            return "pages/customer/profile-customer" ;
+        }
+        return "redirect:/";
+    }
+
+    @PostMapping("/profile/update")
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public String updateProfile(@ModelAttribute Customer customer) {
+        customerService.saveCustomer(customer);
+        return "redirect:/profile/" + customer.getCustomerId();
     }
 }

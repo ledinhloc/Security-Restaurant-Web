@@ -25,8 +25,10 @@ public class CustomerService {
 
 
     public Customer saveCustomer(Customer customer) {
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        customer.setPassword(passwordEncoder.encode(customer.getPassword()));
+        if(customer.getPassword() != null && !customer.getPassword().isEmpty()) {
+            PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+            customer.setPassword(passwordEncoder.encode(customer.getPassword()));
+        }
         return customerRepository.save(customer);
     }
 
