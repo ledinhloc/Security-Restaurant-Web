@@ -2,6 +2,9 @@ server:
   port: 8080
   servlet:
     context-path: /
+    session:
+      cookie:
+        same-site: strict
 
 spring:
   datasource:
