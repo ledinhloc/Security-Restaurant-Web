@@ -69,7 +69,7 @@ public class SecurityConfig {
                     .maxSessionsPreventsLogin(false)
             );
 
-        http.csrf(AbstractHttpConfigurer::disable);
+
         return http.build();
     }
 

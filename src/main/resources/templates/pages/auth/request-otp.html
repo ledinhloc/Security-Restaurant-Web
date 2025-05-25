@@ -18,6 +18,7 @@
 
         <!-- OTP Request Form -->
         <form action="/request-otp" method="post" class="space-y-4">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <div>
                 <label for="phoneNumber" class="block text-sm font-medium text-gray-700">Phone Number</label>
                 <input type="text" name="phoneNumber" id="phoneNumber" placeholder="Enter your phone number"

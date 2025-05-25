@@ -13,6 +13,7 @@
 
     <!-- Form to enter phone number and OTP -->
     <form action="/verify-otp" method="post" class="space-y-4">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
         <div>
             <label for="phoneNumber" class="block text-gray-700 text-sm font-medium">Phone Number</label>
             <input type="text" id="phoneNumber" name="phoneNumber" th:value="${phoneNumber}" placeholder="Enter your phone number"
