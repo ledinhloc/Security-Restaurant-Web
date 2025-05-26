@@ -24,19 +24,21 @@
             <h2 class="text-3xl font-bold text-center text-blue-500 mb-6">Create Your Account</h2>
 
             <!-- Form đăng ký -->
-            <form action="/register" method="post">
+            <form action="/register" method="post" id="registrationForm" onsubmit="return validateForm()">
                 <!-- First Name -->
                 <div class="mb-4">
                     <label for="firstName" class="block text-gray-700 font-semibold text-sm mb-2">First Name</label>
                     <input type="text" id="firstName" name="firstName" placeholder="Enter your first name"
-                           class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                           class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           required maxlength="50">
                 </div>
 
                 <!-- Last Name -->
                 <div class="mb-4">
                     <label for="lastName" class="block text-gray-700 font-semibold text-sm mb-2">Last Name</label>
                     <input type="text" id="lastName" name="lastName" placeholder="Enter your last name"
-                           class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                           class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           required maxlength="50">
                 </div>
 
                 <!-- Email -->
@@ -68,10 +70,20 @@
                 </div>
 
                 <!-- Password -->
-                <div class="mb-6">
+                <div class="mb-4">
                     <label for="password" class="block text-gray-700 font-semibold text-sm mb-2">Password</label>
                     <input type="password" id="password" name="password" placeholder="Enter your password"
-                           class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                           class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                           required pattern="^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,}$">
+                    <div class="mt-2 text-sm text-gray-600">
+                        <p>Mật khẩu phải chứa:</p>
+                        <ul class="list-disc list-inside">
+                            <li>Ít nhất 10 kí tự</li>
+                            <li>Ít nhất 1 chữ hoa</li>
+                            <li>Ít nhất 1 chữ thường</li>
+                            <li>Ít nhất 1 kí tự đặc biệt (!@#$%^&*)</li>
+                        </ul>
+                    </div>
                 </div>
 
                 <!-- Submit Button -->
@@ -88,6 +100,40 @@
         </div>
     </div>
 </div>
+
+<script>
+    function validateForm() {
+        const password = document.getElementById('password').value;
+        const passwordRegex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,}$/;
+
+        if (!passwordRegex.test(password)) {
+            alert('Mật khẩu phải chứa ít nhất 10 ký tự, bao gồm chữ hoa, số và ký tự đặc biệt. (!@#$%^&*)');
+            return false;
+        }
+        return true;
+    }
+
+    / Thêm hàm xử lý giới hạn ký tự
+function limitInputLength(input) {
+    if (input.value.length > 50) {
+        input.value = input.value.slice(0, 50);
+    }
+}
+
+// Thêm event listeners cho các trường input
+document.addEventListener('DOMContentLoaded', function() {
+    const firstNameInput = document.getElementById('firstName');
+    const lastNameInput = document.getElementById('lastName');
+
+    firstNameInput.addEventListener('input', function() {
+        limitInputLength(this);
+    });
+
+    lastNameInput.addEventListener('input', function() {
+        limitInputLength(this);
+    });
+});
+</script>
 
 </body>
 </html>

@@ -115,9 +115,27 @@ public class AccountController {
 
     //luu customer
     @PostMapping("/register")
-    public String registerCustomer(@ModelAttribute("customer") Customer customer){
+    public String registerCustomer(@ModelAttribute("customer") Customer customer, Model model){
+        // Validate password
+        String password = customer.getPassword();
+        if (!isValidPassword(password)) {
+            model.addAttribute("error", "Mật khẩu phải chứa ít nhất 10 ký tự, bao gồm chữ hoa, số và 1 ký tự đặc biệt.(!@#$%^&*)");
+            return "pages/auth/registerCustomer";
+        }
         customerService.saveCustomer(customer);
         return "redirect:/login";
+    }
+    private boolean isValidPassword(String password) {
+        if (password == null) return false;
+
+        if (password.length() < 10) return false;
+        if (!password.matches(".*[A-Z].*")) return false;
+
+        if (!password.matches(".*[0-9].*")) return false;
+
+        if (!password.matches(".*[!@#$%^&*].*")) return false;
+
+        return true;
     }
 
     @GetMapping("/")
