@@ -135,8 +135,15 @@ public class AccountController {
     public String showProfileFile(@PathVariable Long id, Model model) {
         Customer customer = customerService.getCustomerById(id);
         if (customer != null) {
-            model.addAttribute("customer", customer);
-            return "pages/customer/profile-customer";
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String loggedInEmail = authentication.getName(); // Lấy email người đăng nhập
+            // So sánh email đăng nhập với email của customer
+            if (customer.getEmail().equalsIgnoreCase(loggedInEmail)) {
+                model.addAttribute("customer", customer);
+                return "pages/customer/profile-customer";
+            } else {
+                return "pages/error";
+            }
         }
         return "redirect:/";
     }
