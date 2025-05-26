@@ -1,23 +1,26 @@
 package com.restaurant.management.config.security;
 
+import com.restaurant.management.controller.AccountController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
 public class SecurityConfig {
+
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
+
+    @Autowired
+    private AccountController accountController;
 
     private static final String[] ADMIN_ENDPOINTS = {
             "/inventories/**", "/tables", "/employees/**", "/customers",
@@ -30,7 +33,6 @@ public class SecurityConfig {
             "/forgot-password", "/resources/**", "/css/**", "/"
     };
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -41,7 +43,10 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/profile", false)
+                        .loginProcessingUrl("/perform_login") // Rõ ràng URL xử lý đăng nhập
+                        .defaultSuccessUrl("/profile", true)
+                        .failureHandler(authenticationFailureHandler())
+                        .successHandler(authenticationSuccessHandler())
                         .permitAll()
                 )
                 .logout(logout -> logout
@@ -54,45 +59,31 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .maximumSessions(1)
                         .maxSessionsPreventsLogin(false)
-                );
-//                .headers(headers -> headers
-//                        .contentSecurityPolicy(csp -> csp
-//                                .policyDirectives(
-//                                        "default-src 'self'; " +
-//                                                "script-src 'self' https://cdn.tailwindcss.com; " +
-//                                                "style-src 'self' ; " +
-//                                                "img-src 'self' data:; " +
-//                                                "font-src 'self'; " +
-//                                                "connect-src 'self'; " +
-//                                                "frame-ancestors 'none'; " +
-//                                                "form-action 'self'; " +
-//                                                "base-uri 'self'"
-//                                )
-//                        )
-//                );
-
-//                .headers(headers -> headers
-//                        .contentSecurityPolicy(csp -> csp
-//                                .policyDirectives("default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:")
-//                        )
-//                );
-//            .headers(headers -> headers
-//                    .contentSecurityPolicy(csp -> csp
-//                            .policyDirectives(
-//                                    "default-src 'self'; " +
-//                                            "script-src 'self' https://cdn.jsdelivr.net; " +
-//                                            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-//                                            "font-src 'self' https://fonts.gstatic.com; " +
-//                                            "img-src 'self' data:; " +
-//                                            "connect-src 'self' https://api.example.com; " +
-//                                            "frame-src 'none'; " +
-//                                            "object-src 'none';"
-//                            )
-//                    )
-//            );
-
-        http.csrf(AbstractHttpConfigurer::disable);
+                )
+                .csrf(AbstractHttpConfigurer::disable);
         return http.build();
+    }
+
+    @Bean
+    public AuthenticationFailureHandler authenticationFailureHandler() {
+        return (request, response, exception) -> {
+            String username = request.getParameter("username");
+            System.out.println("Authentication failed for username: " + username); // Debug
+            if (username != null && !username.isEmpty()) {
+                accountController.incrementLoginAttempts(username);
+            }
+            response.sendRedirect("/login?error=true&username=" + (username != null ? username : ""));
+        };
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler authenticationSuccessHandler() {
+        return (request, response, authentication) -> {
+            String username = authentication.getName();
+            System.out.println("Authentication successful for: " + username); // Debug
+            accountController.resetLoginAttempts(username);
+            response.sendRedirect("/profile");
+        };
     }
 
     @Bean
@@ -104,5 +95,4 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }
