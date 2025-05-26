@@ -26,8 +26,8 @@ public class SecurityConfig {
     };
 
     private static final String[] PUBLIC_ENDPOINTS = {
-            "/login", "/request-otp", "/register", "/verify-otp",
-            "/forgot-password", "/resources/**", "/css/**", "/"
+            "/images/**", "/login", "/request-otp", "/register", "/verify-otp",
+            "/forgot-password", "/resources/**", "/css/**", "/",
     };
 
 
@@ -49,6 +49,7 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login?logout")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
+                        .permitAll()
                 )
                 .userDetailsService(customUserDetailsService)
                 .sessionManagement(session -> session
@@ -59,10 +60,10 @@ public class SecurityConfig {
 //                        .contentSecurityPolicy(csp -> csp
 //                                .policyDirectives(
 //                                        "default-src 'self'; " +
-//                                                "script-src 'self' https://cdn.tailwindcss.com; " +
-//                                                "style-src 'self' ; " +
-//                                                "img-src 'self' data:; " +
-//                                                "font-src 'self'; " +
+//                                                "script-src 'self' https://cdn.tailwindcss.com https://unpkg.com;" +
+//                                                "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
+//                                                "img-src 'self' data: http://res.cloudinary.com; " +
+//                                                "font-src 'self' https://cdnjs.cloudflare.com; " +
 //                                                "connect-src 'self'; " +
 //                                                "frame-ancestors 'none'; " +
 //                                                "form-action 'self'; " +
@@ -70,27 +71,6 @@ public class SecurityConfig {
 //                                )
 //                        )
 //                );
-
-//                .headers(headers -> headers
-//                        .contentSecurityPolicy(csp -> csp
-//                                .policyDirectives("default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:")
-//                        )
-//                );
-//            .headers(headers -> headers
-//                    .contentSecurityPolicy(csp -> csp
-//                            .policyDirectives(
-//                                    "default-src 'self'; " +
-//                                            "script-src 'self' https://cdn.jsdelivr.net; " +
-//                                            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-//                                            "font-src 'self' https://fonts.gstatic.com; " +
-//                                            "img-src 'self' data:; " +
-//                                            "connect-src 'self' https://api.example.com; " +
-//                                            "frame-src 'none'; " +
-//                                            "object-src 'none';"
-//                            )
-//                    )
-//            );
-
         http.csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }
