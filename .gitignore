@@ -33,5 +33,3 @@ build/
 .vscode/
 mvnw
 mvnw.cmd
-
-.env
