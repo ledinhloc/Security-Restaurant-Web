@@ -25,20 +25,22 @@ public class CustomUserDetailsService implements UserDetailsService {
         System.out.println("Email login:::" + email);
         Employee employee = employeeService.getEmployeeByEmail(email);
         if (employee != null) {
-            return User.builder()
-                    .username(employee.getEmail())
-                    .password(employee.getPassword())
-                    .roles(employee.getPosition())
-                    .build();
+            return new CustomUserDetails(
+                    employee.getEmail(),
+                    employee.getPassword(),
+                    "ROLE_" + employee.getPosition(),
+                    employee.getId()
+            );
         }
 
         Optional<Customer> customer = customerService.getCustomerByEmail(email);
         if (customer.isPresent()) {
-            return User.builder()
-                    .username(customer.get().getEmail())
-                    .password(customer.get().getPassword())
-                    .roles("CUSTOMER")
-                    .build();
+            return new CustomUserDetails(
+                    customer.get().getEmail(),
+                    customer.get().getPassword(),
+                    "ROLE_CUSTOMER",
+                    customer.get().getCustomerId()
+            );
         }
 
         throw new UsernameNotFoundException("User not found with email: " + email);
