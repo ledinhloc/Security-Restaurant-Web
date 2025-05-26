@@ -13,6 +13,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class SecurityConfig {
@@ -55,25 +57,38 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .maximumSessions(1)
                         .maxSessionsPreventsLogin(false)
+                )
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp -> csp
+                                .policyDirectives(
+                                        "default-src 'self'; " +
+                                                "script-src 'self' https://unpkg.com;" +
+                                                "style-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
+                                                "img-src 'self' data: http://res.cloudinary.com; " +
+                                                "font-src 'self' https://cdnjs.cloudflare.com; " +
+                                                "connect-src 'self'; " +
+                                                "frame-ancestors 'none'; " +
+                                                "form-action 'self'; " +
+                                                "base-uri 'self'"
+                                )
+                        )
                 );
-//                .headers(headers -> headers
-//                        .contentSecurityPolicy(csp -> csp
-//                                .policyDirectives(
-//                                        "default-src 'self'; " +
-//                                                "script-src 'self' https://cdn.tailwindcss.com https://unpkg.com;" +
-//                                                "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
-//                                                "img-src 'self' data: http://res.cloudinary.com; " +
-//                                                "font-src 'self' https://cdnjs.cloudflare.com; " +
-//                                                "connect-src 'self'; " +
-//                                                "frame-ancestors 'none'; " +
-//                                                "form-action 'self'; " +
-//                                                "base-uri 'self'"
-//                                )
-//                        )
-//                );
         http.csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }
+
+//    @Bean
+//    public WebMvcConfigurer corsConfigurer() {
+//        return new WebMvcConfigurer() {
+//            @Override
+//            public void addCorsMappings(CorsRegistry registry) {
+//                registry.addMapping("/**")
+//                        .allowedOrigins("http://localhost:8080") // ✅ Thay bằng domain thật
+//                        .allowedMethods("GET", "POST", "PUT", "DELETE")
+//                        .allowCredentials(true);
+//            }
+//        };
+//    }
 
     @Bean
     public UserDetailsService userDetailsService() {
