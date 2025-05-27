@@ -62,7 +62,7 @@ public class SecurityConfig {
                         .contentSecurityPolicy(csp -> csp
                                 .policyDirectives(
                                         "default-src 'self'; " +
-                                                "script-src 'self' https://unpkg.com;" +
+                                                "script-src 'self' https://cdn.tailwindcss.com https://unpkg.com;" +
                                                 "style-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " +
                                                 "img-src 'self' data: http://res.cloudinary.com; " +
                                                 "font-src 'self' https://cdnjs.cloudflare.com; " +
@@ -73,6 +73,7 @@ public class SecurityConfig {
                                 )
                         )
                 );
+
         http.csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }
